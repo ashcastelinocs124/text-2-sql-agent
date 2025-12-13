@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentx"
+version = "0.1.0"
+description = "Enterprise SQL Agent Evaluation Framework"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "AgentX Team"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "sqlalchemy>=2.0.0",
+    "sqlglot>=23.0.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "duckdb>=0.9.0",
+    "duckdb-engine>=0.10.0",
+]
+
+[project.optional-dependencies]
+cloud = [
+    "snowflake-sqlalchemy>=1.5.0",
+    "sqlalchemy-bigquery>=1.9.0",
+    "google-cloud-bigquery>=3.0.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "black>=23.0.0",
+]
+all = ["agentx[cloud,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/ashcastelinocs124/AgentX-Hackathon"
+Repository = "https://github.com/ashcastelinocs124/AgentX-Hackathon"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true

@@ -1,217 +1,308 @@
-'''
-Scorer combines:
-- correctness (from ComparisonResult)
-- efficiency (from timing + QueryPlan)
-- safety (from hallucination info)
-into a MultiDimensionalScore for a single task.
-'''
+"""
+Scorer computes weighted multi-dimensional scores from SQLAgent output.
+
+Dimensions:
+- correctness (40%): from comparison with expected results
+- efficiency (20%): from execution time
+- safety (25%): from validation errors / hallucination detection
+- result_completeness (15%): from analysis insights
+
+Final score = weighted sum of all dimensions.
+"""
 
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 
-from data_structures import (
+from evaluation.data_structures import (
     ComparisonResult,
-    QueryPlan,
     MultiDimensionalScore,
+    ExecutionResult,
 )
 
 
 class Scorer(ABC):
     """
-    Interface for computing multi-dimensional scores for a task.
-
-    Responsibilities:
-        - Combine correctness, efficiency, and safety into a MultiDimensionalScore.
+    Interface for computing weighted multi-dimensional scores.
     """
 
     @abstractmethod
     def score(
         self,
         comparison: ComparisonResult,
-        timing_ms: float,
-        query_plan: Optional[QueryPlan] = None,
-        hallucination_info: Optional[Dict[str, Any]] = None,
+        execution_result: ExecutionResult,
     ) -> MultiDimensionalScore:
         """
-        Compute and return a MultiDimensionalScore for one task.
+        Compute a weighted multi-dimensional score.
+
+        Parameters:
+            comparison       -> Result of comparing actual vs expected output.
+            execution_result -> Execution result with validation/analysis metadata from SQLAgent.
+
+        Returns:
+            MultiDimensionalScore with individual scores and weighted overall score.
         """
-        raise NotImplementedError
+        pass
 
 
 class DefaultScorer(Scorer):
     """
     Default implementation of Scorer.
-
-    Scoring:
-        - correctness:
-            - primarily from comparison.is_correct,
-            - but also uses row_match_ratio and column_match_ratio
-              to give partial credit.
-        - efficiency:
-            - based on execution time (ms),
-            - optionally uses QueryPlan.estimated_cost if available.
-        - safety:
-            - penalizes hallucinations based on hallucination_info signals.
-
-    All three are combined into an overall score via weighted average.
+    
+    Computes scores from SQLAgent output and applies configurable weights.
+    
+    Default weights:
+        - correctness: 40%
+        - efficiency: 20%
+        - safety: 25%
+        - result_completeness: 15%
     """
 
     def __init__(
         self,
-        weight_correctness: float = 0.6,
-        weight_efficiency: float = 0.2,
-        weight_safety: float = 0.2,
-    ) -> None:
+        performance_thresholds: Optional[Dict[str, float]] = None,
+        weights: Optional[Dict[str, float]] = None,
+    ):
         """
-        Initialize the scorer with weights for each dimension.
+        Initialize the scorer.
 
         Parameters:
-            weight_correctness -> Weight for correctness score.
-            weight_efficiency  -> Weight for efficiency score.
-            weight_safety      -> Weight for safety score.
+            performance_thresholds -> Thresholds for efficiency scoring (ms).
+            weights                -> Weights for each scoring dimension (must sum to 1.0).
         """
-        self.weight_correctness = weight_correctness
-        self.weight_efficiency = weight_efficiency
-        self.weight_safety = weight_safety
-
-
-    def _score_correctness(self, comparison: ComparisonResult) -> float:
-        """
-        Compute a correctness score in [0, 1].
-
-        Strategy:
-            - If is_correct is True, return 1.0.
-            - Otherwise, blend row_match_ratio and column_match_ratio
-              to give partial credit.
-        """
-        if comparison.is_correct:
-            return 1.0
-
-        # 70% rows, 30% columns
-        score = 0.7 * comparison.row_match_ratio + 0.3 * comparison.column_match_ratio
-        # Clamp to [0, 1]
-        return max(0.0, min(1.0, score))
-
-    def _score_efficiency(
-        self,
-        timing_ms: float,
-        query_plan: Optional[QueryPlan] = None,
-    ) -> float:
-        """
-        Compute an efficiency score in [0, 1].
-
-        Strategy (simple, hackathon-friendly):
-            - Use a decaying function of execution time:
-                - very fast queries (~0-100 ms) -> near 1.0
-                - slower queries -> gradually lower score.
-            - Optionally adjust based on estimated_cost if available.
-        """
-
-        # Base on timing: 1 / (1 + t/1000) maps:
-        #   0 ms   -> 1.0
-        #   100 ms -> ~0.91
-        #   500 ms -> ~0.67
-        #   1000ms -> 0.5
-        base_eff = 1.0 / (1.0 + (timing_ms / 1000.0))
-
-        # Adjust slightly if estimated_cost is available
-        if query_plan is not None and query_plan.estimated_cost is not None:
-            cost = query_plan.estimated_cost
-            # Simple normalization: assume "reasonable" cost up to 100000.
-            # Larger costs get penalized.
-            cost_factor = 1.0 / (1.0 + (cost / 100000.0))
-            eff = base_eff * cost_factor
-        else:
-            eff = base_eff
-
-        # Clamp to [0, 1]
-        return max(0.0, min(1.0, eff))
-
-    def _score_safety(self, hallucination_info: Optional[Dict[str, Any]]) -> float:
-        """
-        Compute a safety score in [0, 1].
-
-        Strategy:
-            - If no hallucination_info is provided, assume safe (score = 1.0).
-            - If hallucination_info contains:
-                - 'has_hallucination': bool
-                  - True  -> strong penalty
-                  - False -> full score
-                - OR 'score': float in [0, 1] (already a safety-like score).
-        """
-        if hallucination_info is None:
-            return 1.0
-
-        # Case 1: direct score provided
-        if "score" in hallucination_info:
-            raw_score = float(hallucination_info["score"])
-            return max(0.0, min(1.0, raw_score))
-
-        # Case 2: has_hallucination flag
-        if hallucination_info.get("has_hallucination") is True:
-            # Hard penalty if hallucination detected
-            return 0.0
-
-        # If we explicitly know there is no hallucination
-        if hallucination_info.get("has_hallucination") is False:
-            return 1.0
-
-        # Default: unknown -> high score
-        return 0.9
-
-    # ---------- Main scoring entrypoint ----------
+        self.performance_thresholds = performance_thresholds or {
+            "excellent": 10.0,    # < 10ms = 1.0
+            "good": 100.0,        # < 100ms = 0.8+
+            "acceptable": 1000.0, # < 1000ms = 0.5+
+        }
+        self.weights = weights or {
+            "correctness": 0.40,
+            "efficiency": 0.20,
+            "safety": 0.25,
+            "result_completeness": 0.15,
+        }
 
     def score(
         self,
         comparison: ComparisonResult,
-        timing_ms: float,
-        query_plan: Optional[QueryPlan] = None,
-        hallucination_info: Optional[Dict[str, Any]] = None,
+        execution_result: ExecutionResult,
     ) -> MultiDimensionalScore:
         """
-        Compute and return a MultiDimensionalScore for one task.
+        Compute weighted multi-dimensional score.
+        
+        Steps:
+            1. Compute individual dimension scores from SQLAgent data
+            2. Apply weights to each dimension
+            3. Sum weighted scores for final overall score
         """
+        score = MultiDimensionalScore(weights=self.weights)
 
-        correctness = self._score_correctness(comparison)
-        efficiency = self._score_efficiency(timing_ms, query_plan)
-        safety = self._score_safety(hallucination_info)
+        # 1. Correctness (from comparison with expected results)
+        score.correctness = self._compute_correctness(comparison)
 
-        # Weighted overall score
-        total_weight = (
-            self.weight_correctness + self.weight_efficiency + self.weight_safety
-        )
-        overall = (
-            correctness * self.weight_correctness
-            + efficiency * self.weight_efficiency
-            + safety * self.weight_safety
-        ) / total_weight
+        # 2. Efficiency (from execution time)
+        score.efficiency = self._compute_efficiency(execution_result)
+        score.performance_score = score.efficiency
 
-        # Clamp overall just in case
-        overall = max(0.0, min(1.0, overall))
+        # 3. Safety (from validation + hallucination detection)
+        score.safety = self._compute_safety(execution_result)
+        score.validation_score = self._compute_validation_score(execution_result)
+        score.hallucination_score = self._compute_hallucination_score(execution_result)
 
-        details = {
-            "correctness_component": correctness,
-            "efficiency_component": efficiency,
-            "safety_component": safety,
-            "weights": {
-                "correctness": self.weight_correctness,
-                "efficiency": self.weight_efficiency,
-                "safety": self.weight_safety,
+        # 4. Result completeness (from analysis insights)
+        score.result_completeness = self._compute_completeness(execution_result)
+
+        # 5. Compute weighted overall score
+        score.compute_overall()
+
+        # 6. Add detailed breakdown
+        score.details = self._build_details(comparison, execution_result)
+
+        return score
+
+    def _compute_correctness(self, comparison: ComparisonResult) -> float:
+        """
+        Compute correctness score from comparison result.
+        
+        - Exact match: 1.0
+        - Partial match: match_score (0.0 to 1.0)
+        - No comparison: 0.0
+        """
+        if comparison.is_match:
+            return 1.0
+        return comparison.match_score
+
+    def _compute_efficiency(self, execution_result: ExecutionResult) -> float:
+        """
+        Compute efficiency score from execution time.
+        
+        Scoring:
+            - < 10ms (excellent): 1.0
+            - < 100ms (good): 0.8 - 1.0
+            - < 1000ms (acceptable): 0.5 - 0.8
+            - > 1000ms (slow): 0.0 - 0.5
+        """
+        if not execution_result.success:
+            return 0.0
+
+        time_ms = execution_result.execution_time_ms
+
+        if time_ms <= self.performance_thresholds["excellent"]:
+            return 1.0
+        elif time_ms <= self.performance_thresholds["good"]:
+            # Linear interpolation: 1.0 → 0.8
+            ratio = (time_ms - self.performance_thresholds["excellent"]) / \
+                    (self.performance_thresholds["good"] - self.performance_thresholds["excellent"])
+            return 1.0 - (0.2 * ratio)
+        elif time_ms <= self.performance_thresholds["acceptable"]:
+            # Linear interpolation: 0.8 → 0.5
+            ratio = (time_ms - self.performance_thresholds["good"]) / \
+                    (self.performance_thresholds["acceptable"] - self.performance_thresholds["good"])
+            return 0.8 - (0.3 * ratio)
+        else:
+            # Slow query: 0.5 → 0.0
+            excess = time_ms - self.performance_thresholds["acceptable"]
+            return max(0.0, 0.5 - (excess / 10000))
+
+    def _compute_safety(self, execution_result: ExecutionResult) -> float:
+        """
+        Compute overall safety score.
+        
+        Combines:
+            - Validation score (40%)
+            - Hallucination score (60%)
+        """
+        validation_score = self._compute_validation_score(execution_result)
+        hallucination_score = self._compute_hallucination_score(execution_result)
+
+        return 0.4 * validation_score + 0.6 * hallucination_score
+
+    def _compute_validation_score(self, execution_result: ExecutionResult) -> float:
+        """
+        Compute validation score based on query validity.
+        
+        Scoring:
+            - Valid with no warnings: 1.0
+            - Valid with warnings: 0.9 - 1.0 (deduct 0.1 per warning)
+            - Invalid: 0.1 - 0.5 (based on error count)
+        """
+        if execution_result.is_valid:
+            score = 1.0
+            warning_count = len(execution_result.validation_warnings)
+            score -= warning_count * 0.1
+            return max(0.0, score)
+        else:
+            error_count = len(execution_result.validation_errors)
+            if error_count == 0:
+                return 0.5
+            elif error_count == 1:
+                return 0.3
+            else:
+                return 0.1
+
+    def _compute_hallucination_score(self, execution_result: ExecutionResult) -> float:
+        """
+        Compute hallucination score based on validation errors.
+        
+        Hallucinations include:
+            - Non-existent table references
+            - Non-existent column references
+            - Invalid schema references
+        
+        Scoring:
+            - No hallucinations: 1.0
+            - 1 hallucination: 0.4
+            - 2+ hallucinations: 0.1
+        """
+        if execution_result.is_valid and not execution_result.validation_errors:
+            return 1.0
+
+        hallucination_keywords = [
+            "does not exist",
+            "unknown column",
+            "unknown table",
+            "invalid",
+            "not found",
+            "no such",
+            "doesn't exist",
+        ]
+
+        hallucination_count = 0
+        for error in execution_result.validation_errors:
+            error_lower = error.lower()
+            if any(keyword in error_lower for keyword in hallucination_keywords):
+                hallucination_count += 1
+
+        if hallucination_count == 0:
+            return 1.0
+        elif hallucination_count == 1:
+            return 0.4
+        else:
+            return 0.1
+
+    def _compute_completeness(self, execution_result: ExecutionResult) -> float:
+        """
+        Compute result completeness score from analysis insights.
+        
+        Penalties:
+            - "no results": -0.2
+            - "truncated": -0.1
+            - "null": -0.05
+            - "slow": -0.1
+        
+        Bonus:
+            - Has rows: +0.1 (capped at 1.0)
+        """
+        if not execution_result.success:
+            return 0.0
+
+        score = 1.0
+
+        for insight in execution_result.insights:
+            insight_lower = insight.lower()
+            if "no results" in insight_lower or "empty" in insight_lower:
+                score -= 0.2
+            elif "truncated" in insight_lower:
+                score -= 0.1
+            elif "null" in insight_lower:
+                score -= 0.05
+            elif "slow" in insight_lower or "long" in insight_lower:
+                score -= 0.1
+
+        # Bonus for having results
+        if execution_result.rows_returned > 0:
+            score = min(1.0, score + 0.1)
+
+        return max(0.0, score)
+
+    def _build_details(
+        self,
+        comparison: ComparisonResult,
+        execution_result: ExecutionResult,
+    ) -> Dict[str, Any]:
+        """Build detailed breakdown for debugging and analysis."""
+        return {
+            "comparison": {
+                "is_match": comparison.is_match,
+                "match_score": comparison.match_score,
+                "row_count_match": comparison.row_count_match,
+                "column_count_match": comparison.column_count_match,
             },
-            "timing_ms": timing_ms,
+            "execution": {
+                "success": execution_result.success,
+                "execution_time_ms": execution_result.execution_time_ms,
+                "rows_returned": execution_result.rows_returned,
+                "error": execution_result.error,
+            },
+            "validation": {
+                "is_valid": execution_result.is_valid,
+                "errors": execution_result.validation_errors,
+                "warnings": execution_result.validation_warnings,
+                "query_type": execution_result.query_type,
+                "tables_accessed": execution_result.tables_accessed,
+                "columns_accessed": execution_result.columns_accessed,
+            },
+            "analysis": {
+                "insights": execution_result.insights,
+                "summary": execution_result.summary,
+            },
         }
-
-        if query_plan is not None:
-            details["query_plan_cost"] = query_plan.estimated_cost
-            details["query_plan_rows"] = query_plan.estimated_rows
-
-        if hallucination_info is not None:
-            details["hallucination_info"] = hallucination_info
-
-        return MultiDimensionalScore(
-            correctness=correctness,
-            efficiency=efficiency,
-            safety=safety,
-            overall=overall,
-            details=details,
-        )

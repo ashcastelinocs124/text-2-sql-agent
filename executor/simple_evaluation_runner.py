@@ -1,162 +1,323 @@
-# This file defines SimpleEvaluationRunner.
-#
-# SimpleEvaluationRunner is a minimal end-to-end evaluation orchestrator.
-# It integrates together:
-#   - an agent (that generates SQL for a Task),
-#   - a SQLExecutor,
-#   - an optional QueryAnalyzer,
-#   - a ResultComparator,
-#   - a Scorer,
-# and returns TaskResult objects for each Task.
+"""
+SimpleEvaluationRunner - Evaluation orchestrator.
 
-from typing import Iterable, List, Optional, Any
+Takes SQL query → sends to SQLAgent → computes weighted score.
+
+Flow:
+    1. Receive SQL query (from Task)
+    2. Send to SQLAgent (agent executes in sandbox, returns data)
+    3. Convert SQLAgent output to ExecutionResult
+    4. Optionally compare with expected results
+    5. Compute weighted MultiDimensionalScore
+    6. Return TaskResult
+
+SQLAgent handles all execution in sandbox.
+"""
+
+from typing import Iterable, List, Optional, Any, Dict
 
 from executor.data_structures import Task, TaskResult
 from evaluation.data_structures import (
     ExecutionResult,
     ComparisonResult,
     MultiDimensionalScore,
-    QueryPlan,
+    AgentResult,
 )
 
-from evaluation.sql_executor import SQLExecutor          
-from evaluation.query_analyzer import QueryAnalyzer      
-from evaluation.result_comparator import ResultComparator 
-from evaluation.scorer import Scorer                    
+from evaluation.result_comparator import ResultComparator
+from evaluation.scorer import Scorer
+from executor.sql_agent import SQLAgent 
+
 
 
 class SimpleEvaluationRunner:
     """
-    A minimal evaluation runner that executes a sequence of Tasks end-to-end.
-
-    Responsibilities for each Task:
-        1. Ask the agent to generate SQL for the Task.
-        2. Execute that SQL using SQLExecutor.
-        3. Optionally obtain a QueryPlan using QueryAnalyzer.
-        4. If expected_result is available:
-               Compare actual vs expected using ResultComparator.
-           Else:
-               Create a dummy ComparisonResult.
-        5. Compute a MultiDimensionalScore using Scorer.
-        6. Return a TaskResult.
+    Evaluation runner that:
+        1. Sends SQL to SQLAgent (executes in sandbox)
+        2. Takes returned data
+        3. Computes weighted scores from that data
+        4. Optionally compares with expected output
+    
+    We do NOT execute SQL ourselves.
     """
 
     def __init__(
         self,
-        agent: Any,
-        executor: SQLExecutor,
-        comparator: ResultComparator,
+        sql_agent: Any,
         scorer: Scorer,
-        query_analyzer: Optional[QueryAnalyzer] = None,
+        comparator: Optional[ResultComparator] = None,
     ) -> None:
         """
-        Initialize the runner with all necessary dependencies.
+        Initialize the runner.
 
         Parameters:
-            agent          -> Object with a method `generate_sql(task: Task) -> str`.
-                              (In phase 1, this can be a dummy agent that returns gold SQL.)
-            executor       -> Concrete implementation of SQLExecutor (e.g., DBAPISQLExecutor).
-            comparator     -> Concrete implementation of ResultComparator
-                              (e.g., ExactMatchComparator).
-            scorer         -> Concrete implementation of Scorer (e.g., DefaultScorer).
-            query_analyzer -> Optional QueryAnalyzer used to obtain QueryPlan for scoring.
+            sql_agent  -> SQLAgent instance (executes SQL in sandbox, returns data).
+            scorer     -> Computes weighted multi-dimensional scores from SQLAgent output.
+            comparator -> Optional. Compares actual vs expected results for correctness.
         """
-        self.agent = agent
-        self.executor = executor
-        self.comparator = comparator
+        self.sql_agent = sql_agent
         self.scorer = scorer
-        self.query_analyzer = query_analyzer
+        self.comparator = comparator
 
-    def _make_dummy_comparison(self, message: str) -> ComparisonResult:
+    def run(self, tasks: Iterable[Task], verbose: bool = False) -> List[TaskResult]:
         """
-        Create a ComparisonResult representing a non-comparable or failed case,
-        e.g., when expected_result is missing or SQL execution failed.
+        Evaluate all tasks and return results.
 
-        This keeps the rest of the pipeline from having to special-case None.
-        """
-        return ComparisonResult(
-            is_correct=False,
-            row_match_ratio=0.0,
-            column_match_ratio=0.0,
-            numeric_tolerance_ok=False,
-            missing_columns=[],
-            extra_columns=[],
-            message=message,
-        )
+        Parameters:
+            tasks   -> Iterable of Task objects (each contains sql_query).
+            verbose -> Print detailed output during processing.
 
-    def _make_zero_score(self, reason: str) -> MultiDimensionalScore:
-        """
-        Create a MultiDimensionalScore with all zeros, used in error cases.
-        """
-        return MultiDimensionalScore(
-            correctness=0.0,
-            efficiency=0.0,
-            safety=0.0,
-            overall=0.0,
-            details={"reason": reason},
-        )
-
-    def run(self, tasks: Iterable[Task]) -> List[TaskResult]:
-        """
-        Run evaluation over a sequence of Tasks and return a list of TaskResult.
+        Returns:
+            List of TaskResult objects with weighted scores.
         """
         results: List[TaskResult] = []
 
         for task in tasks:
-            # 1. Ask the agent to generate SQL for this Task
-            generated_sql = self.agent.generate_sql(task)
-
-            # 2. Execute the SQL
-            execution: ExecutionResult = self.executor.execute(generated_sql)
-
-            # 3. Optionally obtain a QueryPlan
-            query_plan: Optional[QueryPlan] = None
-            if self.query_analyzer is not None and execution.error is None:
-                query_plan = self.query_analyzer.analyze(generated_sql)
-
-            # 4. Compare actual vs expected (if we have expected_result)
-            if execution.error is not None:
-                # Execution failed; produce a dummy ComparisonResult and zero score
-                comparison = self._make_dummy_comparison(
-                    message=f"SQL execution failed: {execution.error}"
-                )
-                score = self._make_zero_score(reason="execution_error")
-            elif task.expected_result is None:
-                # Cannot compare without ground-truth expected_result
-                comparison = self._make_dummy_comparison(
-                    message="No expected_result provided for this task; "
-                            "skipping correctness comparison."
-                )
-                # You can decide here: maybe still score efficiency based on execution/query_plan.
-                score = self.scorer.score(
-                    comparison=comparison,
-                    timing_ms=execution.timing_ms,
-                    query_plan=query_plan,
-                    hallucination_info=None,
-                )
-            else:
-                # Happy path: execution succeeded and we have an expected_result
-                comparison: ComparisonResult = self.comparator.compare(
-                    actual=execution.rows,
-                    expected=task.expected_result,
-                )
-                score: MultiDimensionalScore = self.scorer.score(
-                    comparison=comparison,
-                    timing_ms=execution.timing_ms,
-                    query_plan=query_plan,
-                    hallucination_info=None,  # hook Dev 2's output here later
-                )
-
-            # 5. put everything into a TaskResult
-            task_result = TaskResult(
-                task=task,
-                generated_sql=generated_sql,
-                execution=execution,
-                comparison=comparison,
-                score=score,
-                query_plan=query_plan,
-            )
-
+            task_result = self._process_task(task, verbose)
             results.append(task_result)
 
         return results
+
+    def run_single(self, task: Task, verbose: bool = False) -> TaskResult:
+        """Evaluate a single task and return weighted scores."""
+        return self._process_task(task, verbose)
+
+    def run_sql(
+        self,
+        sql: str,
+        task_id: str = "direct",
+        expected_result: Optional[List[Dict[str, Any]]] = None,
+        verbose: bool = False,
+    ) -> TaskResult:
+        """
+        Evaluate a SQL query directly (without creating a Task).
+
+        Parameters:
+            sql             -> SQL query to evaluate.
+            task_id         -> Identifier for this evaluation.
+            expected_result -> Optional expected output for correctness comparison.
+            verbose         -> Print detailed output.
+
+        Returns:
+            TaskResult with weighted scores.
+        """
+        task = Task(
+            task_id=task_id,
+            question="Direct SQL evaluation",
+            sql_query=sql,
+            expected_result=expected_result,
+        )
+        return self._process_task(task, verbose)
+
+    def _process_task(self, task: Task, verbose: bool = False) -> TaskResult:
+        """
+        Process a single task through the evaluation pipeline.
+
+        Steps:
+            1. Get SQL from task
+            2. Send to SQLAgent (executes in sandbox)
+            3. Convert response to ExecutionResult
+            4. Optionally compare with expected output
+            5. Compute weighted score using Scorer
+            6. Return TaskResult
+        """
+        sql = task.sql_query
+
+        if verbose:
+            print(f"\n{'='*60}")
+            print(f"📝 Task: {task.task_id}")
+            print(f"{'='*60}")
+            print(f"Question: {task.question}")
+            print(f"\n🔧 SQL:\n{sql}")
+
+        # Step 1: Send SQL to SQLAgent (it executes in sandbox)
+        agent_result = self._call_sql_agent(sql, verbose)
+
+        # Step 2: Convert to ExecutionResult
+        execution_result = agent_result.to_execution_result()
+
+        if verbose:
+            status = "✅ SUCCESS" if execution_result.success else "❌ FAILED"
+            print(f"\n📊 Execution: {status}")
+            if execution_result.error:
+                print(f"   Error: {execution_result.error}")
+            else:
+                print(f"   Rows returned: {execution_result.rows_returned}")
+                print(f"   Time: {execution_result.execution_time_ms:.2f}ms")
+                print(f"   Valid: {execution_result.is_valid}")
+
+        # Step 3: Compare with expected output (optional)
+        comparison = self._compare_results(execution_result, task, verbose)
+
+        # Step 4: Compute weighted score
+        score = self._compute_score(comparison, execution_result, verbose)
+
+        # Step 5: Return TaskResult
+        return TaskResult(
+            task=task,
+            generated_sql=sql,
+            execution=execution_result,
+            comparison=comparison,
+            score=score,
+        )
+
+    def _call_sql_agent(self, sql: str, verbose: bool) -> AgentResult:
+        """
+        Call SQLAgent to execute SQL in sandbox.
+
+        We do NOT execute SQL ourselves - SQLAgent does it.
+        We just receive the results.
+        """
+        if not sql:
+            return AgentResult(
+                query="",
+                timestamp="",
+                overall_status="FAILED",
+                validation={"is_valid": False, "errors": ["No SQL provided"]},
+                execution={"success": False, "error": "No SQL to execute"},
+                analysis={},
+            )
+
+        try:
+            # SQLAgent executes in sandbox and returns data
+            agent_output = self.sql_agent.process_query(sql, verbose=verbose)
+            return AgentResult.from_agent_output(agent_output)
+
+        except Exception as e:
+            if verbose:
+                print(f"❌ SQLAgent error: {e}")
+            return AgentResult(
+                query=sql,
+                timestamp="",
+                overall_status="FAILED",
+                validation={"is_valid": False, "errors": [str(e)]},
+                execution={"success": False, "error": str(e)},
+                analysis={},
+            )
+
+    def _compare_results(
+        self,
+        execution_result: ExecutionResult,
+        task: Task,
+        verbose: bool,
+    ) -> ComparisonResult:
+        """
+        Compare actual results with expected results (optional).
+
+        Only runs if:
+            1. Comparator is provided
+            2. Task has expected_result
+            3. Execution was successful
+        """
+        expected_result = getattr(task, "expected_result", None)
+
+        # Skip if no comparator or no expected result
+        if not self.comparator or expected_result is None:
+            if verbose and expected_result is None:
+                print("\n⚠️  No expected result - skipping comparison")
+            return ComparisonResult(
+                is_match=False,
+                match_score=0.0,
+                details={"reason": "No expected result or comparator"},
+            )
+
+        # Skip if execution failed
+        if not execution_result.success:
+            if verbose:
+                print("\n⚠️  Execution failed - cannot compare")
+            return ComparisonResult(
+                is_match=False,
+                match_score=0.0,
+                details={"reason": "Execution failed", "error": execution_result.error},
+            )
+
+        # Compare actual vs expected
+        try:
+            comparison = self.comparator.compare(
+                actual=execution_result.data,
+                expected=expected_result,
+            )
+            if verbose:
+                status = "✅ MATCH" if comparison.is_match else "❌ NO MATCH"
+                print(f"\n📊 Comparison: {status} (score: {comparison.match_score:.2f})")
+            return comparison
+
+        except Exception as e:
+            if verbose:
+                print(f"\n❌ Comparison error: {e}")
+            return ComparisonResult(
+                is_match=False,
+                match_score=0.0,
+                details={"reason": "Comparison error", "error": str(e)},
+            )
+
+    def _compute_score(
+        self,
+        comparison: ComparisonResult,
+        execution_result: ExecutionResult,
+        verbose: bool,
+    ) -> MultiDimensionalScore:
+        """
+        Compute weighted multi-dimensional score from SQLAgent output.
+        
+        Uses Scorer to:
+            1. Compute individual dimension scores
+            2. Apply weights
+            3. Calculate final overall score
+        """
+        try:
+            score = self.scorer.score(
+                comparison=comparison,
+                execution_result=execution_result,
+            )
+
+            if verbose:
+                print(f"\n🏆 Weighted Scores:")
+                print(f"   Correctness (40%):    {score.correctness:.2f}")
+                print(f"   Efficiency (20%):     {score.efficiency:.2f}")
+                print(f"   Safety (25%):         {score.safety:.2f}")
+                print(f"   Completeness (15%):   {score.result_completeness:.2f}")
+                print(f"   ─────────────────────────────")
+                print(f"   OVERALL SCORE:        {score.overall:.2f}")
+
+            return score
+
+        except Exception as e:
+            if verbose:
+                print(f"\n❌ Scoring error: {e}")
+            return MultiDimensionalScore()
+
+    def get_summary(self, results: List[TaskResult]) -> Dict[str, Any]:
+        """
+        Generate aggregate summary of evaluation results.
+
+        Returns:
+            Dictionary with totals, success rate, and average weighted scores.
+        """
+        if not results:
+            return {"total_tasks": 0}
+
+        total = len(results)
+        successful = sum(1 for r in results if r.execution.success)
+        correct = sum(1 for r in results if r.comparison.is_match)
+
+        avg_correctness = sum(r.score.correctness for r in results) / total
+        avg_efficiency = sum(r.score.efficiency for r in results) / total
+        avg_safety = sum(r.score.safety for r in results) / total
+        avg_completeness = sum(r.score.result_completeness for r in results) / total
+        avg_overall = sum(r.score.overall for r in results) / total
+
+        return {
+            "total_tasks": total,
+            "successful_executions": successful,
+            "correct_results": correct,
+            "success_rate": round(successful / total, 4),
+            "accuracy": round(correct / total, 4) if self.comparator else None,
+            "average_scores": {
+                "correctness": round(avg_correctness, 4),
+                "efficiency": round(avg_efficiency, 4),
+                "safety": round(avg_safety, 4),
+                "completeness": round(avg_completeness, 4),
+                "overall": round(avg_overall, 4),
+            },
+        }

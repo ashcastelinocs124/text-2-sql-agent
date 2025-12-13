@@ -1,151 +1,303 @@
-'''
-ResultComparator compares the agent's actual SQL result
-against the expected result and returns a ComparisonResult.
-'''
+"""
+ResultComparator compares actual query results against expected results.
 
+Provides flexible comparison with:
+- Exact matching
+- Row order tolerance
+- Numeric tolerance for floating-point values
+- Partial matching with scores
+"""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Dict, List, Optional, Set
+import math
 
-import pandas as pd
-from pandas import DataFrame
-
-from data_structures import ComparisonResult  
+from evaluation.data_structures import ComparisonResult
 
 
 class ResultComparator(ABC):
     """
-    Base interface for all result comparison strategies.
-
-    Responsibilities:
-        - Compare actual results vs expected results.
-        - Return a ComparisonResult with detailed match/mismatch info.
+    Abstract interface for comparing actual vs expected query results.
     """
 
     @abstractmethod
-    def compare(self, actual: Any, expected: Any) -> ComparisonResult:
-        raise NotImplementedError
-
-
-class ExactMatchComparator(ResultComparator):
-    """
-    Concrete comparator that checks for (almost) exact equality between
-    the actual and expected results.
-
-    Assumptions:
-        - 'actual' and 'expected' are:
-            - either pandas DataFrames, OR
-            - data that can be converted to DataFrames.
-        - Column names matter.
-        - Row contents must match exactly.
-        - Row order is IGNORED (we sort by all columns before comparing).
-
-    Behavior:
-        - If shapes, column sets, and all values match -> is_correct = True.
-        - Otherwise:
-            - compute row_match_ratio and column_match_ratio,
-            - fill missing_columns and extra_columns,
-            - provide a human-readable message.
-    """
-
-    def _to_dataframe(self, value: Any, label: str) -> DataFrame:
+    def compare(
+        self,
+        actual: List[Dict[str, Any]],
+        expected: List[Dict[str, Any]],
+    ) -> ComparisonResult:
         """
-        Helper to convert arbitrary value into a pandas DataFrame.
+        Compare actual results against expected results.
+
+        Parameters:
+            actual   -> List of row dictionaries from query execution.
+            expected -> List of row dictionaries representing expected output.
+
+        Returns:
+            ComparisonResult with match status and detailed breakdown.
         """
-        if isinstance(value, pd.DataFrame):
-            return value.copy()
+        pass
 
-        try:
-            df = pd.DataFrame(value)
-            return df
-        except Exception as exc:
-            raise TypeError(
-                f"Cannot convert {label} to pandas DataFrame for comparison: {exc}"
-            ) from exc
 
-    def compare(self, actual: Any, expected: Any) -> ComparisonResult:
-        # Convert both to DataFrames
-        actual_df = self._to_dataframe(actual, "actual")
-        expected_df = self._to_dataframe(expected, "expected")
+class DefaultResultComparator(ResultComparator):
+    """
+    Default implementation of ResultComparator.
 
-        # Normalize column order: line up expected columns first
-        actual_cols = list(actual_df.columns)
-        expected_cols = list(expected_df.columns)
+    Features:
+    - Configurable numeric tolerance for float comparisons
+    - Optional row order sensitivity
+    - Partial match scoring
+    """
 
-        # Compute column-level info
-        expected_set = set(expected_cols)
-        actual_set = set(actual_cols)
+    def __init__(
+        self,
+        numeric_tolerance: float = 1e-6,
+        ignore_row_order: bool = True,
+        ignore_column_order: bool = True,
+        case_sensitive: bool = False,
+    ):
+        """
+        Initialize the comparator with configuration options.
 
-        missing_columns = sorted(list(expected_set - actual_set))
-        extra_columns = sorted(list(actual_set - expected_set))
-        common_columns = sorted(list(expected_set & actual_set))
+        Parameters:
+            numeric_tolerance   -> Tolerance for floating-point comparisons.
+            ignore_row_order    -> If True, rows can be in any order.
+            ignore_column_order -> If True, columns can be in any order.
+            case_sensitive      -> If True, string comparisons are case-sensitive.
+        """
+        self.numeric_tolerance = numeric_tolerance
+        self.ignore_row_order = ignore_row_order
+        self.ignore_column_order = ignore_column_order
+        self.case_sensitive = case_sensitive
 
-        # Column match ratio: fraction of expected columns present
-        column_match_ratio = (
-            len(common_columns) / len(expected_cols) if expected_cols else 1.0
+    def compare(
+        self,
+        actual: List[Dict[str, Any]],
+        expected: List[Dict[str, Any]],
+    ) -> ComparisonResult:
+        """Compare actual results against expected results."""
+
+        # Handle empty cases
+        if not actual and not expected:
+            return ComparisonResult(
+                is_match=True,
+                match_score=1.0,
+                row_count_match=True,
+                column_count_match=True,
+                details={"message": "Both results are empty"},
+            )
+
+        if not actual:
+            return ComparisonResult(
+                is_match=False,
+                match_score=0.0,
+                row_count_match=False,
+                column_count_match=False,
+                details={"message": "Actual result is empty", "expected_rows": len(expected)},
+            )
+
+        if not expected:
+            return ComparisonResult(
+                is_match=False,
+                match_score=0.0,
+                row_count_match=False,
+                column_count_match=False,
+                details={"message": "Expected result is empty", "actual_rows": len(actual)},
+            )
+
+        # Get columns
+        actual_columns = set(actual[0].keys()) if actual else set()
+        expected_columns = set(expected[0].keys()) if expected else set()
+
+        # Check column match
+        column_count_match = len(actual_columns) == len(expected_columns)
+        missing_columns = expected_columns - actual_columns
+        extra_columns = actual_columns - expected_columns
+        common_columns = actual_columns & expected_columns
+
+        # Check row count match
+        row_count_match = len(actual) == len(expected)
+
+        # Calculate column match ratio
+        if expected_columns:
+            column_match_ratio = len(common_columns) / len(expected_columns)
+        else:
+            column_match_ratio = 1.0 if not actual_columns else 0.0
+
+        # Compare rows
+        row_match_result = self._compare_rows(actual, expected, common_columns)
+
+        # Calculate overall match score
+        match_score = self._calculate_match_score(
+            column_match_ratio=column_match_ratio,
+            row_match_ratio=row_match_result["row_match_ratio"],
+            row_count_match=row_count_match,
+            column_count_match=column_count_match,
         )
 
-        # If there are no common columns - incorrect
-        if not common_columns:
-            return ComparisonResult(
-                is_correct=False,
-                row_match_ratio=0.0,
-                column_match_ratio=column_match_ratio,
-                numeric_tolerance_ok=False,
-                missing_columns=missing_columns,
-                extra_columns=extra_columns,
-                message="No overlapping columns between actual and expected results.",
-            )
-
-        # Restrict both DataFrames to the common columns in the same order
-        actual_common = actual_df[common_columns].copy()
-        expected_common = expected_df[common_columns].copy()
-
-        # Sort rows by all common columns so row order doesn't affect equality
-        actual_sorted = actual_common.sort_values(by=common_columns).reset_index(drop=True)
-        expected_sorted = expected_common.sort_values(by=common_columns).reset_index(drop=True)
-
-        # Exact equality check
-        frames_equal = actual_sorted.equals(expected_sorted)
-
-        # Compute row_match_ratio as similarity of row sets
-        #treat rows as tuples across all common columns.
-        actual_rows = [tuple(row) for _, row in actual_sorted.iterrows()]
-        expected_rows = [tuple(row) for _, row in expected_sorted.iterrows()]
-
-        actual_row_set = set(actual_rows)
-        expected_row_set = set(expected_rows)
-
-        if expected_rows:
-            matching_rows = len(actual_row_set & expected_row_set)
-            total_expected_rows = len(expected_row_set)
-            row_match_ratio = matching_rows / total_expected_rows
-        else:
-            # If expected is empty:
-            row_match_ratio = 1.0 if not actual_rows else 0.0
-
-        # For this exact comparator, numeric_tolerance_ok is just equality
-        numeric_tolerance_ok = frames_equal
-
-        if frames_equal and not missing_columns and not extra_columns:
-            message = "Actual result matches expected result exactly."
-        else:
-            message = (
-                f"Exact match failed. "
-                f"Row match ratio: {row_match_ratio:.2f}, "
-                f"Column match ratio: {column_match_ratio:.2f}. "
-            )
-            if missing_columns:
-                message += f"Missing columns: {missing_columns}. "
-            if extra_columns:
-                message += f"Extra columns: {extra_columns}. "
+        # Determine if it's an exact match
+        is_match = (
+            match_score >= 0.99 and
+            row_count_match and
+            column_count_match and
+            not missing_columns and
+            not extra_columns
+        )
 
         return ComparisonResult(
-            is_correct=frames_equal and not missing_columns and not extra_columns,
-            row_match_ratio=row_match_ratio,
-            column_match_ratio=column_match_ratio,
-            numeric_tolerance_ok=numeric_tolerance_ok,
-            missing_columns=missing_columns,
-            extra_columns=extra_columns,
-            message=message,
+            is_match=is_match,
+            match_score=match_score,
+            row_count_match=row_count_match,
+            column_count_match=column_count_match,
+            details={
+                "actual_row_count": len(actual),
+                "expected_row_count": len(expected),
+                "actual_columns": list(actual_columns),
+                "expected_columns": list(expected_columns),
+                "missing_columns": list(missing_columns),
+                "extra_columns": list(extra_columns),
+                "common_columns": list(common_columns),
+                "column_match_ratio": column_match_ratio,
+                "row_match_ratio": row_match_result["row_match_ratio"],
+                "matched_rows": row_match_result["matched_rows"],
+                "unmatched_rows": row_match_result["unmatched_rows"],
+            },
         )
+
+    def _compare_rows(
+        self,
+        actual: List[Dict[str, Any]],
+        expected: List[Dict[str, Any]],
+        columns: Set[str],
+    ) -> Dict[str, Any]:
+        """
+        Compare rows between actual and expected results.
+
+        Returns:
+            Dictionary with row_match_ratio, matched_rows, unmatched_rows.
+        """
+        if not columns:
+            return {
+                "row_match_ratio": 0.0,
+                "matched_rows": 0,
+                "unmatched_rows": len(expected),
+            }
+
+        if self.ignore_row_order:
+            return self._compare_rows_unordered(actual, expected, columns)
+        else:
+            return self._compare_rows_ordered(actual, expected, columns)
+
+    def _compare_rows_unordered(
+        self,
+        actual: List[Dict[str, Any]],
+        expected: List[Dict[str, Any]],
+        columns: Set[str],
+    ) -> Dict[str, Any]:
+        """Compare rows without considering order."""
+        matched_rows = 0
+        expected_matched = [False] * len(expected)
+
+        for actual_row in actual:
+            for i, expected_row in enumerate(expected):
+                if expected_matched[i]:
+                    continue
+                if self._rows_match(actual_row, expected_row, columns):
+                    matched_rows += 1
+                    expected_matched[i] = True
+                    break
+
+        total_expected = len(expected)
+        row_match_ratio = matched_rows / total_expected if total_expected > 0 else 1.0
+
+        return {
+            "row_match_ratio": row_match_ratio,
+            "matched_rows": matched_rows,
+            "unmatched_rows": total_expected - matched_rows,
+        }
+
+    def _compare_rows_ordered(
+        self,
+        actual: List[Dict[str, Any]],
+        expected: List[Dict[str, Any]],
+        columns: Set[str],
+    ) -> Dict[str, Any]:
+        """Compare rows considering order."""
+        matched_rows = 0
+        min_len = min(len(actual), len(expected))
+
+        for i in range(min_len):
+            if self._rows_match(actual[i], expected[i], columns):
+                matched_rows += 1
+
+        total_expected = len(expected)
+        row_match_ratio = matched_rows / total_expected if total_expected > 0 else 1.0
+
+        return {
+            "row_match_ratio": row_match_ratio,
+            "matched_rows": matched_rows,
+            "unmatched_rows": total_expected - matched_rows,
+        }
+
+    def _rows_match(
+        self,
+        actual_row: Dict[str, Any],
+        expected_row: Dict[str, Any],
+        columns: Set[str],
+    ) -> bool:
+        """Check if two rows match for the given columns."""
+        for col in columns:
+            actual_val = actual_row.get(col)
+            expected_val = expected_row.get(col)
+
+            if not self._values_match(actual_val, expected_val):
+                return False
+
+        return True
+
+    def _values_match(self, actual: Any, expected: Any) -> bool:
+        """Check if two values match with appropriate tolerance."""
+        # Handle None
+        if actual is None and expected is None:
+            return True
+        if actual is None or expected is None:
+            return False
+
+        # Handle numeric comparison with tolerance
+        if isinstance(actual, (int, float)) and isinstance(expected, (int, float)):
+            if math.isnan(actual) and math.isnan(expected):
+                return True
+            return abs(actual - expected) <= self.numeric_tolerance
+
+        # Handle string comparison
+        if isinstance(actual, str) and isinstance(expected, str):
+            if self.case_sensitive:
+                return actual == expected
+            return actual.lower() == expected.lower()
+
+        # Default equality
+        return actual == expected
+
+    def _calculate_match_score(
+        self,
+        column_match_ratio: float,
+        row_match_ratio: float,
+        row_count_match: bool,
+        column_count_match: bool,
+    ) -> float:
+        """
+        Calculate overall match score.
+
+        Weights:
+        - Row match ratio: 50%
+        - Column match ratio: 30%
+        - Row count match: 10%
+        - Column count match: 10%
+        """
+        score = (
+            0.50 * row_match_ratio +
+            0.30 * column_match_ratio +
+            0.10 * (1.0 if row_count_match else 0.0) +
+            0.10 * (1.0 if column_count_match else 0.0)
+        )
+        return round(score, 4)
