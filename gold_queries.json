@@ -1,0 +1,5156 @@
+[
+  {
+    "id": "simple_select_where",
+    "question": "Find all customers from New York",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "easy",
+    "gold_sql": "\n            SELECT customer_id, first_name, last_name, city, state \n            FROM customers \n            WHERE city = 'New York' \n            ORDER BY last_name, first_name\n            ",
+    "expected_result": [
+      {
+        "customer_id": 165,
+        "first_name": "Linda",
+        "last_name": "Allen",
+        "city": "New York",
+        "state": "OH"
+      },
+      {
+        "customer_id": 14,
+        "first_name": "Jennifer",
+        "last_name": "Brown",
+        "city": "New York",
+        "state": "AZ"
+      },
+      {
+        "customer_id": 80,
+        "first_name": "Sandra",
+        "last_name": "Brown",
+        "city": "New York",
+        "state": "OH"
+      },
+      {
+        "customer_id": 170,
+        "first_name": "Lisa",
+        "last_name": "Clark",
+        "city": "New York",
+        "state": "PA"
+      },
+      {
+        "customer_id": 60,
+        "first_name": "Barbara",
+        "last_name": "Davis",
+        "city": "New York",
+        "state": "GA"
+      },
+      {
+        "customer_id": 141,
+        "first_name": "Mary",
+        "last_name": "Harris",
+        "city": "New York",
+        "state": "GA"
+      },
+      {
+        "customer_id": 158,
+        "first_name": "Anthony",
+        "last_name": "Hernandez",
+        "city": "New York",
+        "state": "AZ"
+      },
+      {
+        "customer_id": 172,
+        "first_name": "Mark",
+        "last_name": "King",
+        "city": "New York",
+        "state": "AZ"
+      },
+      {
+        "customer_id": 187,
+        "first_name": "William",
+        "last_name": "Martinez",
+        "city": "New York",
+        "state": "MI"
+      },
+      {
+        "customer_id": 197,
+        "first_name": "Nancy",
+        "last_name": "Robinson",
+        "city": "New York",
+        "state": "AZ"
+      },
+      {
+        "customer_id": 58,
+        "first_name": "John",
+        "last_name": "Rodriguez",
+        "city": "New York",
+        "state": "OH"
+      },
+      {
+        "customer_id": 100,
+        "first_name": "Betty",
+        "last_name": "Smith",
+        "city": "New York",
+        "state": "CA"
+      }
+    ],
+    "tags": [
+      "select",
+      "where",
+      "filtering"
+    ],
+    "created_at": "2025-12-13T17:21:27.463569"
+  },
+  {
+    "id": "join_aggregation",
+    "question": "Show total revenue per customer with their names",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "medium",
+    "gold_sql": "\n            SELECT \n                c.customer_id,\n                c.first_name,\n                c.last_name,\n                COUNT(o.order_id) as order_count,\n                COALESCE(SUM(o.total_amount), 0) as total_revenue\n            FROM customers c\n            LEFT JOIN orders o ON c.customer_id = o.customer_id\n            WHERE o.order_status != 'cancelled' OR o.order_id IS NULL\n            GROUP BY c.customer_id, c.first_name, c.last_name\n            ORDER BY total_revenue DESC\n            ",
+    "expected_result": [
+      {
+        "customer_id": 179,
+        "first_name": "John",
+        "last_name": "King",
+        "order_count": 5,
+        "total_revenue": 1536.95
+      },
+      {
+        "customer_id": 95,
+        "first_name": "David",
+        "last_name": "Lewis",
+        "order_count": 5,
+        "total_revenue": 1283.72
+      },
+      {
+        "customer_id": 100,
+        "first_name": "Betty",
+        "last_name": "Smith",
+        "order_count": 5,
+        "total_revenue": 1275.77
+      },
+      {
+        "customer_id": 162,
+        "first_name": "Helen",
+        "last_name": "Brown",
+        "order_count": 4,
+        "total_revenue": 1188.11
+      },
+      {
+        "customer_id": 157,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "order_count": 4,
+        "total_revenue": 1173.04
+      },
+      {
+        "customer_id": 91,
+        "first_name": "Patricia",
+        "last_name": "Gonzalez",
+        "order_count": 3,
+        "total_revenue": 1162.78
+      },
+      {
+        "customer_id": 121,
+        "first_name": "Barbara",
+        "last_name": "Martin",
+        "order_count": 3,
+        "total_revenue": 1090.63
+      },
+      {
+        "customer_id": 143,
+        "first_name": "David",
+        "last_name": "Lopez",
+        "order_count": 3,
+        "total_revenue": 1078.6
+      },
+      {
+        "customer_id": 163,
+        "first_name": "James",
+        "last_name": "Gonzalez",
+        "order_count": 2,
+        "total_revenue": 1041.56
+      },
+      {
+        "customer_id": 154,
+        "first_name": "Nancy",
+        "last_name": "Lewis",
+        "order_count": 4,
+        "total_revenue": 1016.5
+      },
+      {
+        "customer_id": 130,
+        "first_name": "James",
+        "last_name": "Thomas",
+        "order_count": 2,
+        "total_revenue": 1012.19
+      },
+      {
+        "customer_id": 79,
+        "first_name": "Barbara",
+        "last_name": "Taylor",
+        "order_count": 3,
+        "total_revenue": 986.96
+      },
+      {
+        "customer_id": 14,
+        "first_name": "Jennifer",
+        "last_name": "Brown",
+        "order_count": 3,
+        "total_revenue": 967.26
+      },
+      {
+        "customer_id": 29,
+        "first_name": "Donna",
+        "last_name": "Thompson",
+        "order_count": 4,
+        "total_revenue": 960.74
+      },
+      {
+        "customer_id": 167,
+        "first_name": "Matthew",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 942.4
+      },
+      {
+        "customer_id": 147,
+        "first_name": "Helen",
+        "last_name": "King",
+        "order_count": 2,
+        "total_revenue": 939.78
+      },
+      {
+        "customer_id": 129,
+        "first_name": "John",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 935.32
+      },
+      {
+        "customer_id": 60,
+        "first_name": "Barbara",
+        "last_name": "Davis",
+        "order_count": 2,
+        "total_revenue": 922.22
+      },
+      {
+        "customer_id": 11,
+        "first_name": "Michael",
+        "last_name": "Gonzalez",
+        "order_count": 3,
+        "total_revenue": 906.35
+      },
+      {
+        "customer_id": 24,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "order_count": 2,
+        "total_revenue": 876.02
+      },
+      {
+        "customer_id": 111,
+        "first_name": "Anthony",
+        "last_name": "Lee",
+        "order_count": 3,
+        "total_revenue": 867.94
+      },
+      {
+        "customer_id": 61,
+        "first_name": "Charles",
+        "last_name": "Allen",
+        "order_count": 3,
+        "total_revenue": 860.02
+      },
+      {
+        "customer_id": 39,
+        "first_name": "Charles",
+        "last_name": "Brown",
+        "order_count": 3,
+        "total_revenue": 832.97
+      },
+      {
+        "customer_id": 56,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "order_count": 3,
+        "total_revenue": 811.12
+      },
+      {
+        "customer_id": 85,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "order_count": 2,
+        "total_revenue": 806.14
+      },
+      {
+        "customer_id": 55,
+        "first_name": "Patricia",
+        "last_name": "Thomas",
+        "order_count": 3,
+        "total_revenue": 798.71
+      },
+      {
+        "customer_id": 173,
+        "first_name": "Linda",
+        "last_name": "Taylor",
+        "order_count": 3,
+        "total_revenue": 785.17
+      },
+      {
+        "customer_id": 67,
+        "first_name": "Jessica",
+        "last_name": "Garcia",
+        "order_count": 2,
+        "total_revenue": 779.75
+      },
+      {
+        "customer_id": 190,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 774.41
+      },
+      {
+        "customer_id": 43,
+        "first_name": "Christopher",
+        "last_name": "Anderson",
+        "order_count": 3,
+        "total_revenue": 741.75
+      },
+      {
+        "customer_id": 151,
+        "first_name": "Daniel",
+        "last_name": "King",
+        "order_count": 3,
+        "total_revenue": 741.09
+      },
+      {
+        "customer_id": 172,
+        "first_name": "Mark",
+        "last_name": "King",
+        "order_count": 2,
+        "total_revenue": 732.76
+      },
+      {
+        "customer_id": 196,
+        "first_name": "Patricia",
+        "last_name": "Young",
+        "order_count": 3,
+        "total_revenue": 728.66
+      },
+      {
+        "customer_id": 153,
+        "first_name": "Elizabeth",
+        "last_name": "Taylor",
+        "order_count": 3,
+        "total_revenue": 708.04
+      },
+      {
+        "customer_id": 40,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 693.51
+      },
+      {
+        "customer_id": 155,
+        "first_name": "Jessica",
+        "last_name": "Harris",
+        "order_count": 2,
+        "total_revenue": 672.37
+      },
+      {
+        "customer_id": 197,
+        "first_name": "Nancy",
+        "last_name": "Robinson",
+        "order_count": 2,
+        "total_revenue": 671.49
+      },
+      {
+        "customer_id": 176,
+        "first_name": "Robert",
+        "last_name": "Jackson",
+        "order_count": 3,
+        "total_revenue": 670.02
+      },
+      {
+        "customer_id": 87,
+        "first_name": "Joseph",
+        "last_name": "Smith",
+        "order_count": 2,
+        "total_revenue": 669.26
+      },
+      {
+        "customer_id": 96,
+        "first_name": "Jennifer",
+        "last_name": "Rodriguez",
+        "order_count": 2,
+        "total_revenue": 667.74
+      },
+      {
+        "customer_id": 89,
+        "first_name": "Daniel",
+        "last_name": "Jackson",
+        "order_count": 3,
+        "total_revenue": 652.42
+      },
+      {
+        "customer_id": 44,
+        "first_name": "Joseph",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 648.22
+      },
+      {
+        "customer_id": 156,
+        "first_name": "Donald",
+        "last_name": "Harris",
+        "order_count": 3,
+        "total_revenue": 647.14
+      },
+      {
+        "customer_id": 73,
+        "first_name": "Patricia",
+        "last_name": "Thompson",
+        "order_count": 2,
+        "total_revenue": 645.63
+      },
+      {
+        "customer_id": 198,
+        "first_name": "Matthew",
+        "last_name": "Hernandez",
+        "order_count": 2,
+        "total_revenue": 622.92
+      },
+      {
+        "customer_id": 92,
+        "first_name": "Nancy",
+        "last_name": "Smith",
+        "order_count": 2,
+        "total_revenue": 615.78
+      },
+      {
+        "customer_id": 12,
+        "first_name": "Helen",
+        "last_name": "Smith",
+        "order_count": 2,
+        "total_revenue": 608.31
+      },
+      {
+        "customer_id": 47,
+        "first_name": "Karen",
+        "last_name": "Harris",
+        "order_count": 3,
+        "total_revenue": 607.38
+      },
+      {
+        "customer_id": 148,
+        "first_name": "John",
+        "last_name": "Jones",
+        "order_count": 2,
+        "total_revenue": 607.04
+      },
+      {
+        "customer_id": 69,
+        "first_name": "Betty",
+        "last_name": "Hernandez",
+        "order_count": 3,
+        "total_revenue": 606.58
+      },
+      {
+        "customer_id": 119,
+        "first_name": "Nancy",
+        "last_name": "Taylor",
+        "order_count": 2,
+        "total_revenue": 605.72
+      },
+      {
+        "customer_id": 42,
+        "first_name": "James",
+        "last_name": "Moore",
+        "order_count": 2,
+        "total_revenue": 602.05
+      },
+      {
+        "customer_id": 149,
+        "first_name": "Christopher",
+        "last_name": "Gonzalez",
+        "order_count": 2,
+        "total_revenue": 601.93
+      },
+      {
+        "customer_id": 34,
+        "first_name": "Christopher",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 595.57
+      },
+      {
+        "customer_id": 133,
+        "first_name": "Sandra",
+        "last_name": "Anderson",
+        "order_count": 2,
+        "total_revenue": 593.28
+      },
+      {
+        "customer_id": 30,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "order_count": 2,
+        "total_revenue": 590.57
+      },
+      {
+        "customer_id": 6,
+        "first_name": "Thomas",
+        "last_name": "Thomas",
+        "order_count": 2,
+        "total_revenue": 585.51
+      },
+      {
+        "customer_id": 53,
+        "first_name": "Charles",
+        "last_name": "Robinson",
+        "order_count": 2,
+        "total_revenue": 584.76
+      },
+      {
+        "customer_id": 64,
+        "first_name": "Lisa",
+        "last_name": "Brown",
+        "order_count": 3,
+        "total_revenue": 572.05
+      },
+      {
+        "customer_id": 8,
+        "first_name": "Karen",
+        "last_name": "Walker",
+        "order_count": 3,
+        "total_revenue": 572.02
+      },
+      {
+        "customer_id": 158,
+        "first_name": "Anthony",
+        "last_name": "Hernandez",
+        "order_count": 3,
+        "total_revenue": 557.26
+      },
+      {
+        "customer_id": 159,
+        "first_name": "Charles",
+        "last_name": "Walker",
+        "order_count": 1,
+        "total_revenue": 555.31
+      },
+      {
+        "customer_id": 174,
+        "first_name": "Anthony",
+        "last_name": "Rodriguez",
+        "order_count": 2,
+        "total_revenue": 548.84
+      },
+      {
+        "customer_id": 109,
+        "first_name": "Susan",
+        "last_name": "King",
+        "order_count": 1,
+        "total_revenue": 547.77
+      },
+      {
+        "customer_id": 160,
+        "first_name": "Lisa",
+        "last_name": "Taylor",
+        "order_count": 2,
+        "total_revenue": 547.41
+      },
+      {
+        "customer_id": 52,
+        "first_name": "Linda",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 546.2
+      },
+      {
+        "customer_id": 125,
+        "first_name": "David",
+        "last_name": "Martin",
+        "order_count": 2,
+        "total_revenue": 541.82
+      },
+      {
+        "customer_id": 145,
+        "first_name": "Patricia",
+        "last_name": "Clark",
+        "order_count": 2,
+        "total_revenue": 540.46
+      },
+      {
+        "customer_id": 181,
+        "first_name": "Matthew",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 535.32
+      },
+      {
+        "customer_id": 78,
+        "first_name": "Anthony",
+        "last_name": "King",
+        "order_count": 2,
+        "total_revenue": 533.99
+      },
+      {
+        "customer_id": 113,
+        "first_name": "David",
+        "last_name": "Harris",
+        "order_count": 2,
+        "total_revenue": 530.8
+      },
+      {
+        "customer_id": 106,
+        "first_name": "Christopher",
+        "last_name": "Smith",
+        "order_count": 3,
+        "total_revenue": 516.88
+      },
+      {
+        "customer_id": 183,
+        "first_name": "Donna",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "total_revenue": 501.38
+      },
+      {
+        "customer_id": 17,
+        "first_name": "Helen",
+        "last_name": "Garcia",
+        "order_count": 2,
+        "total_revenue": 495.92
+      },
+      {
+        "customer_id": 80,
+        "first_name": "Sandra",
+        "last_name": "Brown",
+        "order_count": 2,
+        "total_revenue": 491.23
+      },
+      {
+        "customer_id": 5,
+        "first_name": "Joseph",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "total_revenue": 479.09
+      },
+      {
+        "customer_id": 195,
+        "first_name": "Mary",
+        "last_name": "Lee",
+        "order_count": 1,
+        "total_revenue": 478.69
+      },
+      {
+        "customer_id": 37,
+        "first_name": "Donna",
+        "last_name": "Hernandez",
+        "order_count": 2,
+        "total_revenue": 478.56
+      },
+      {
+        "customer_id": 57,
+        "first_name": "David",
+        "last_name": "Robinson",
+        "order_count": 2,
+        "total_revenue": 474.98
+      },
+      {
+        "customer_id": 35,
+        "first_name": "Donna",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "total_revenue": 471.01
+      },
+      {
+        "customer_id": 86,
+        "first_name": "Daniel",
+        "last_name": "Johnson",
+        "order_count": 1,
+        "total_revenue": 470.67
+      },
+      {
+        "customer_id": 189,
+        "first_name": "David",
+        "last_name": "Smith",
+        "order_count": 1,
+        "total_revenue": 466.94
+      },
+      {
+        "customer_id": 59,
+        "first_name": "Betty",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "total_revenue": 465.75
+      },
+      {
+        "customer_id": 123,
+        "first_name": "John",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "total_revenue": 463.9
+      },
+      {
+        "customer_id": 126,
+        "first_name": "Susan",
+        "last_name": "Young",
+        "order_count": 1,
+        "total_revenue": 461.01
+      },
+      {
+        "customer_id": 27,
+        "first_name": "Jennifer",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "total_revenue": 460.08
+      },
+      {
+        "customer_id": 83,
+        "first_name": "Helen",
+        "last_name": "White",
+        "order_count": 1,
+        "total_revenue": 454.82
+      },
+      {
+        "customer_id": 32,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "total_revenue": 451.56
+      },
+      {
+        "customer_id": 170,
+        "first_name": "Lisa",
+        "last_name": "Clark",
+        "order_count": 2,
+        "total_revenue": 449.43
+      },
+      {
+        "customer_id": 178,
+        "first_name": "James",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "total_revenue": 444.35
+      },
+      {
+        "customer_id": 62,
+        "first_name": "Sandra",
+        "last_name": "Johnson",
+        "order_count": 2,
+        "total_revenue": 439.51
+      },
+      {
+        "customer_id": 45,
+        "first_name": "Richard",
+        "last_name": "King",
+        "order_count": 1,
+        "total_revenue": 435.98
+      },
+      {
+        "customer_id": 105,
+        "first_name": "Thomas",
+        "last_name": "Allen",
+        "order_count": 1,
+        "total_revenue": 435.32
+      },
+      {
+        "customer_id": 192,
+        "first_name": "Donald",
+        "last_name": "Clark",
+        "order_count": 2,
+        "total_revenue": 431.94
+      },
+      {
+        "customer_id": 54,
+        "first_name": "John",
+        "last_name": "Williams",
+        "order_count": 1,
+        "total_revenue": 426.52
+      },
+      {
+        "customer_id": 188,
+        "first_name": "Patricia",
+        "last_name": "Davis",
+        "order_count": 1,
+        "total_revenue": 424.94
+      },
+      {
+        "customer_id": 112,
+        "first_name": "Anthony",
+        "last_name": "Miller",
+        "order_count": 2,
+        "total_revenue": 423.12
+      },
+      {
+        "customer_id": 49,
+        "first_name": "John",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 414.35
+      },
+      {
+        "customer_id": 68,
+        "first_name": "Daniel",
+        "last_name": "Robinson",
+        "order_count": 1,
+        "total_revenue": 411.53
+      },
+      {
+        "customer_id": 136,
+        "first_name": "Nancy",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "total_revenue": 409.4
+      },
+      {
+        "customer_id": 185,
+        "first_name": "Mary",
+        "last_name": "Taylor",
+        "order_count": 1,
+        "total_revenue": 408.83
+      },
+      {
+        "customer_id": 51,
+        "first_name": "William",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 401.54
+      },
+      {
+        "customer_id": 9,
+        "first_name": "Mark",
+        "last_name": "White",
+        "order_count": 1,
+        "total_revenue": 400.54
+      },
+      {
+        "customer_id": 171,
+        "first_name": "Sarah",
+        "last_name": "Wilson",
+        "order_count": 2,
+        "total_revenue": 383.58
+      },
+      {
+        "customer_id": 3,
+        "first_name": "James",
+        "last_name": "Jones",
+        "order_count": 1,
+        "total_revenue": 381.2
+      },
+      {
+        "customer_id": 4,
+        "first_name": "Sarah",
+        "last_name": "Moore",
+        "order_count": 1,
+        "total_revenue": 381.2
+      },
+      {
+        "customer_id": 144,
+        "first_name": "Matthew",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "total_revenue": 379.42
+      },
+      {
+        "customer_id": 169,
+        "first_name": "Barbara",
+        "last_name": "Jones",
+        "order_count": 1,
+        "total_revenue": 379.09
+      },
+      {
+        "customer_id": 120,
+        "first_name": "John",
+        "last_name": "Moore",
+        "order_count": 2,
+        "total_revenue": 372.05
+      },
+      {
+        "customer_id": 19,
+        "first_name": "Daniel",
+        "last_name": "Harris",
+        "order_count": 1,
+        "total_revenue": 349.31
+      },
+      {
+        "customer_id": 110,
+        "first_name": "Anthony",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "total_revenue": 348.48
+      },
+      {
+        "customer_id": 127,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "order_count": 1,
+        "total_revenue": 348.14
+      },
+      {
+        "customer_id": 104,
+        "first_name": "Jessica",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "total_revenue": 344.18
+      },
+      {
+        "customer_id": 187,
+        "first_name": "William",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "total_revenue": 339.36
+      },
+      {
+        "customer_id": 101,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "order_count": 1,
+        "total_revenue": 335.13
+      },
+      {
+        "customer_id": 23,
+        "first_name": "Matthew",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "total_revenue": 329.48
+      },
+      {
+        "customer_id": 38,
+        "first_name": "Donald",
+        "last_name": "Martin",
+        "order_count": 1,
+        "total_revenue": 328.49
+      },
+      {
+        "customer_id": 175,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "order_count": 3,
+        "total_revenue": 328.2
+      },
+      {
+        "customer_id": 137,
+        "first_name": "Donald",
+        "last_name": "Hernandez",
+        "order_count": 1,
+        "total_revenue": 322.76
+      },
+      {
+        "customer_id": 46,
+        "first_name": "Mark",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "total_revenue": 314.39
+      },
+      {
+        "customer_id": 184,
+        "first_name": "Christopher",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "total_revenue": 309.22
+      },
+      {
+        "customer_id": 66,
+        "first_name": "Nancy",
+        "last_name": "Walker",
+        "order_count": 2,
+        "total_revenue": 305.81
+      },
+      {
+        "customer_id": 194,
+        "first_name": "Susan",
+        "last_name": "Garcia",
+        "order_count": 1,
+        "total_revenue": 273.49
+      },
+      {
+        "customer_id": 94,
+        "first_name": "Patricia",
+        "last_name": "Williams",
+        "order_count": 1,
+        "total_revenue": 255.06
+      },
+      {
+        "customer_id": 90,
+        "first_name": "Charles",
+        "last_name": "Young",
+        "order_count": 1,
+        "total_revenue": 254.79
+      },
+      {
+        "customer_id": 16,
+        "first_name": "Thomas",
+        "last_name": "Davis",
+        "order_count": 2,
+        "total_revenue": 246.87
+      },
+      {
+        "customer_id": 191,
+        "first_name": "Donna",
+        "last_name": "Brown",
+        "order_count": 1,
+        "total_revenue": 243.96
+      },
+      {
+        "customer_id": 164,
+        "first_name": "Nancy",
+        "last_name": "White",
+        "order_count": 1,
+        "total_revenue": 243.11
+      },
+      {
+        "customer_id": 131,
+        "first_name": "Karen",
+        "last_name": "White",
+        "order_count": 2,
+        "total_revenue": 240.84
+      },
+      {
+        "customer_id": 84,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "order_count": 1,
+        "total_revenue": 239.67
+      },
+      {
+        "customer_id": 21,
+        "first_name": "Richard",
+        "last_name": "Miller",
+        "order_count": 2,
+        "total_revenue": 228.46
+      },
+      {
+        "customer_id": 165,
+        "first_name": "Linda",
+        "last_name": "Allen",
+        "order_count": 1,
+        "total_revenue": 226.67
+      },
+      {
+        "customer_id": 182,
+        "first_name": "Joseph",
+        "last_name": "Brown",
+        "order_count": 1,
+        "total_revenue": 224.77
+      },
+      {
+        "customer_id": 76,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "order_count": 3,
+        "total_revenue": 219.04
+      },
+      {
+        "customer_id": 98,
+        "first_name": "Charles",
+        "last_name": "Taylor",
+        "order_count": 1,
+        "total_revenue": 214.68
+      },
+      {
+        "customer_id": 141,
+        "first_name": "Mary",
+        "last_name": "Harris",
+        "order_count": 1,
+        "total_revenue": 212.66
+      },
+      {
+        "customer_id": 117,
+        "first_name": "Charles",
+        "last_name": "Lee",
+        "order_count": 1,
+        "total_revenue": 209.89
+      },
+      {
+        "customer_id": 10,
+        "first_name": "Thomas",
+        "last_name": "Wilson",
+        "order_count": 2,
+        "total_revenue": 199.34
+      },
+      {
+        "customer_id": 93,
+        "first_name": "Daniel",
+        "last_name": "Williams",
+        "order_count": 1,
+        "total_revenue": 196.44
+      },
+      {
+        "customer_id": 186,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "order_count": 1,
+        "total_revenue": 172.06
+      },
+      {
+        "customer_id": 168,
+        "first_name": "Robert",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "total_revenue": 167.32
+      },
+      {
+        "customer_id": 200,
+        "first_name": "Susan",
+        "last_name": "Johnson",
+        "order_count": 1,
+        "total_revenue": 160.32
+      },
+      {
+        "customer_id": 103,
+        "first_name": "Jessica",
+        "last_name": "Martin",
+        "order_count": 1,
+        "total_revenue": 155.94
+      },
+      {
+        "customer_id": 116,
+        "first_name": "Christopher",
+        "last_name": "Brown",
+        "order_count": 2,
+        "total_revenue": 154.29
+      },
+      {
+        "customer_id": 88,
+        "first_name": "Anthony",
+        "last_name": "Jones",
+        "order_count": 1,
+        "total_revenue": 134.94
+      },
+      {
+        "customer_id": 146,
+        "first_name": "Karen",
+        "last_name": "Brown",
+        "order_count": 1,
+        "total_revenue": 134.51
+      },
+      {
+        "customer_id": 97,
+        "first_name": "Sandra",
+        "last_name": "Smith",
+        "order_count": 1,
+        "total_revenue": 133.39
+      },
+      {
+        "customer_id": 48,
+        "first_name": "John",
+        "last_name": "Martinez",
+        "order_count": 2,
+        "total_revenue": 112.36
+      },
+      {
+        "customer_id": 193,
+        "first_name": "Daniel",
+        "last_name": "Clark",
+        "order_count": 1,
+        "total_revenue": 104.42
+      },
+      {
+        "customer_id": 50,
+        "first_name": "Christopher",
+        "last_name": "Williams",
+        "order_count": 1,
+        "total_revenue": 93.67
+      },
+      {
+        "customer_id": 13,
+        "first_name": "Anthony",
+        "last_name": "Martin",
+        "order_count": 1,
+        "total_revenue": 84.73
+      },
+      {
+        "customer_id": 82,
+        "first_name": "John",
+        "last_name": "Brown",
+        "order_count": 1,
+        "total_revenue": 69.5
+      },
+      {
+        "customer_id": 118,
+        "first_name": "Daniel",
+        "last_name": "Miller",
+        "order_count": 1,
+        "total_revenue": 63.49
+      },
+      {
+        "customer_id": 132,
+        "first_name": "William",
+        "last_name": "Williams",
+        "order_count": 1,
+        "total_revenue": 60.91
+      },
+      {
+        "customer_id": 74,
+        "first_name": "Elizabeth",
+        "last_name": "Moore",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 150,
+        "first_name": "James",
+        "last_name": "Hernandez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 140,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 139,
+        "first_name": "Lisa",
+        "last_name": "Allen",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 28,
+        "first_name": "Anthony",
+        "last_name": "Moore",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 77,
+        "first_name": "Karen",
+        "last_name": "Lopez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 72,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 26,
+        "first_name": "Sarah",
+        "last_name": "Thomas",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 15,
+        "first_name": "John",
+        "last_name": "Young",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 25,
+        "first_name": "Patricia",
+        "last_name": "Thomas",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 122,
+        "first_name": "Mary",
+        "last_name": "Rodriguez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 58,
+        "first_name": "John",
+        "last_name": "Rodriguez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 161,
+        "first_name": "Mary",
+        "last_name": "Hernandez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 177,
+        "first_name": "Charles",
+        "last_name": "Taylor",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 20,
+        "first_name": "Matthew",
+        "last_name": "Jones",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 1,
+        "first_name": "Sarah",
+        "last_name": "Harris",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 124,
+        "first_name": "Michael",
+        "last_name": "Rodriguez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 65,
+        "first_name": "Karen",
+        "last_name": "Garcia",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 18,
+        "first_name": "Christopher",
+        "last_name": "Young",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 135,
+        "first_name": "Christopher",
+        "last_name": "Taylor",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 22,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 108,
+        "first_name": "Mary",
+        "last_name": "Gonzalez",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 115,
+        "first_name": "Jennifer",
+        "last_name": "Miller",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 180,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 70,
+        "first_name": "Thomas",
+        "last_name": "Davis",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 71,
+        "first_name": "Jennifer",
+        "last_name": "Allen",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 114,
+        "first_name": "John",
+        "last_name": "King",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 2,
+        "first_name": "Christopher",
+        "last_name": "Young",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 199,
+        "first_name": "David",
+        "last_name": "Smith",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 102,
+        "first_name": "Donna",
+        "last_name": "Allen",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 75,
+        "first_name": "James",
+        "last_name": "White",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 128,
+        "first_name": "Jessica",
+        "last_name": "Thomas",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 31,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 36,
+        "first_name": "Patricia",
+        "last_name": "King",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 166,
+        "first_name": "William",
+        "last_name": "Davis",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 99,
+        "first_name": "James",
+        "last_name": "Moore",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 142,
+        "first_name": "Daniel",
+        "last_name": "King",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 41,
+        "first_name": "Linda",
+        "last_name": "Moore",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 152,
+        "first_name": "Mark",
+        "last_name": "Walker",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 134,
+        "first_name": "Karen",
+        "last_name": "Thomas",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 107,
+        "first_name": "Mark",
+        "last_name": "Taylor",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 7,
+        "first_name": "Linda",
+        "last_name": "Martin",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 63,
+        "first_name": "Charles",
+        "last_name": "Martin",
+        "order_count": 0,
+        "total_revenue": 0.0
+      },
+      {
+        "customer_id": 138,
+        "first_name": "Matthew",
+        "last_name": "Lewis",
+        "order_count": 0,
+        "total_revenue": 0.0
+      }
+    ],
+    "tags": [
+      "join",
+      "aggregation",
+      "group_by"
+    ],
+    "created_at": "2025-12-13T17:21:27.467887"
+  },
+  {
+    "id": "complex_multi_join",
+    "question": "Find top 5 products with highest revenue including category and supplier info",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "hard",
+    "gold_sql": "\n            SELECT \n                p.product_name,\n                c.category_name,\n                s.supplier_name,\n                SUM(oi.quantity * oi.total_price) as total_revenue,\n                SUM(oi.quantity) as total_sold\n            FROM products p\n            JOIN categories c ON p.category_id = c.category_id\n            JOIN suppliers s ON p.supplier_id = s.supplier_id\n            JOIN order_items oi ON p.product_id = oi.product_id\n            JOIN orders o ON oi.order_id = o.order_id\n            WHERE o.order_status != 'cancelled'\n            GROUP BY p.product_id, p.product_name, c.category_name, s.supplier_name\n            ORDER BY total_revenue DESC\n            LIMIT 5\n            ",
+    "expected_result": [
+      {
+        "product_name": "CPU Cooler Liquid 2",
+        "category_name": "Computer Components",
+        "supplier_name": "EuroTech Solutions",
+        "total_revenue": 146872.76,
+        "total_sold": 38
+      },
+      {
+        "product_name": "Graphics Card RTX 8",
+        "category_name": "Speakers",
+        "supplier_name": "LocalParts Co",
+        "total_revenue": 135324.32,
+        "total_sold": 47
+      },
+      {
+        "product_name": "4K Webcam Pro 29",
+        "category_name": "Computers",
+        "supplier_name": "AsiaDirect Trading",
+        "total_revenue": 122550.04,
+        "total_sold": 33
+      },
+      {
+        "product_name": "Case ATX Mid Tower 17",
+        "category_name": "Computer Components",
+        "supplier_name": "EuroTech Solutions",
+        "total_revenue": 111545.85,
+        "total_sold": 37
+      },
+      {
+        "product_name": "RAM 16GB DDR4 97",
+        "category_name": "Audio",
+        "supplier_name": "Global Components Inc",
+        "total_revenue": 107237.8,
+        "total_sold": 39
+      }
+    ],
+    "tags": [
+      "join",
+      "aggregation",
+      "multi_table",
+      "limit"
+    ],
+    "created_at": "2025-12-13T17:21:27.472972"
+  },
+  {
+    "id": "subquery_exists",
+    "question": "Find customers who have purchased products with ratings above 4.5",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "hard",
+    "gold_sql": "\n            SELECT DISTINCT\n                c.customer_id,\n                c.first_name,\n                c.last_name,\n                c.email\n            FROM customers c\n            WHERE EXISTS (\n                SELECT 1\n                FROM orders o\n                JOIN order_items oi ON o.order_id = oi.order_id\n                JOIN products p ON oi.product_id = p.product_id\n                WHERE o.customer_id = c.customer_id\n                AND o.order_status != 'cancelled'\n                AND p.rating > 4.5\n            )\n            ORDER BY c.last_name, c.first_name\n            ",
+    "expected_result": [
+      {
+        "customer_id": 61,
+        "first_name": "Charles",
+        "last_name": "Allen",
+        "email": "charles.allen60@example.com"
+      },
+      {
+        "customer_id": 43,
+        "first_name": "Christopher",
+        "last_name": "Anderson",
+        "email": "christopher.anderson42@example.com"
+      },
+      {
+        "customer_id": 104,
+        "first_name": "Jessica",
+        "last_name": "Anderson",
+        "email": "jessica.anderson103@example.com"
+      },
+      {
+        "customer_id": 5,
+        "first_name": "Joseph",
+        "last_name": "Anderson",
+        "email": "joseph.anderson4@example.com"
+      },
+      {
+        "customer_id": 133,
+        "first_name": "Sandra",
+        "last_name": "Anderson",
+        "email": "sandra.anderson132@example.com"
+      },
+      {
+        "customer_id": 39,
+        "first_name": "Charles",
+        "last_name": "Brown",
+        "email": "charles.brown38@example.com"
+      },
+      {
+        "customer_id": 56,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "email": "daniel.brown55@example.com"
+      },
+      {
+        "customer_id": 162,
+        "first_name": "Helen",
+        "last_name": "Brown",
+        "email": "helen.brown161@example.com"
+      },
+      {
+        "customer_id": 14,
+        "first_name": "Jennifer",
+        "last_name": "Brown",
+        "email": "jennifer.brown13@example.com"
+      },
+      {
+        "customer_id": 64,
+        "first_name": "Lisa",
+        "last_name": "Brown",
+        "email": "lisa.brown63@example.com"
+      },
+      {
+        "customer_id": 80,
+        "first_name": "Sandra",
+        "last_name": "Brown",
+        "email": "sandra.brown79@example.com"
+      },
+      {
+        "customer_id": 193,
+        "first_name": "Daniel",
+        "last_name": "Clark",
+        "email": "daniel.clark192@example.com"
+      },
+      {
+        "customer_id": 192,
+        "first_name": "Donald",
+        "last_name": "Clark",
+        "email": "donald.clark191@example.com"
+      },
+      {
+        "customer_id": 127,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "email": "donna.clark126@example.com"
+      },
+      {
+        "customer_id": 145,
+        "first_name": "Patricia",
+        "last_name": "Clark",
+        "email": "patricia.clark144@example.com"
+      },
+      {
+        "customer_id": 60,
+        "first_name": "Barbara",
+        "last_name": "Davis",
+        "email": "barbara.davis59@example.com"
+      },
+      {
+        "customer_id": 188,
+        "first_name": "Patricia",
+        "last_name": "Davis",
+        "email": "patricia.davis187@example.com"
+      },
+      {
+        "customer_id": 16,
+        "first_name": "Thomas",
+        "last_name": "Davis",
+        "email": "thomas.davis15@example.com"
+      },
+      {
+        "customer_id": 17,
+        "first_name": "Helen",
+        "last_name": "Garcia",
+        "email": "helen.garcia16@example.com"
+      },
+      {
+        "customer_id": 67,
+        "first_name": "Jessica",
+        "last_name": "Garcia",
+        "email": "jessica.garcia66@example.com"
+      },
+      {
+        "customer_id": 194,
+        "first_name": "Susan",
+        "last_name": "Garcia",
+        "email": "susan.garcia193@example.com"
+      },
+      {
+        "customer_id": 149,
+        "first_name": "Christopher",
+        "last_name": "Gonzalez",
+        "email": "christopher.gonzalez148@example.com"
+      },
+      {
+        "customer_id": 183,
+        "first_name": "Donna",
+        "last_name": "Gonzalez",
+        "email": "donna.gonzalez182@example.com"
+      },
+      {
+        "customer_id": 163,
+        "first_name": "James",
+        "last_name": "Gonzalez",
+        "email": "james.gonzalez162@example.com"
+      },
+      {
+        "customer_id": 27,
+        "first_name": "Jennifer",
+        "last_name": "Gonzalez",
+        "email": "jennifer.gonzalez26@example.com"
+      },
+      {
+        "customer_id": 11,
+        "first_name": "Michael",
+        "last_name": "Gonzalez",
+        "email": "michael.gonzalez10@example.com"
+      },
+      {
+        "customer_id": 91,
+        "first_name": "Patricia",
+        "last_name": "Gonzalez",
+        "email": "patricia.gonzalez90@example.com"
+      },
+      {
+        "customer_id": 32,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "email": "susan.gonzalez31@example.com"
+      },
+      {
+        "customer_id": 84,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "email": "charles.harris83@example.com"
+      },
+      {
+        "customer_id": 101,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "email": "charles.harris100@example.com"
+      },
+      {
+        "customer_id": 113,
+        "first_name": "David",
+        "last_name": "Harris",
+        "email": "david.harris112@example.com"
+      },
+      {
+        "customer_id": 156,
+        "first_name": "Donald",
+        "last_name": "Harris",
+        "email": "donald.harris155@example.com"
+      },
+      {
+        "customer_id": 155,
+        "first_name": "Jessica",
+        "last_name": "Harris",
+        "email": "jessica.harris154@example.com"
+      },
+      {
+        "customer_id": 47,
+        "first_name": "Karen",
+        "last_name": "Harris",
+        "email": "karen.harris46@example.com"
+      },
+      {
+        "customer_id": 158,
+        "first_name": "Anthony",
+        "last_name": "Hernandez",
+        "email": "anthony.hernandez157@example.com"
+      },
+      {
+        "customer_id": 69,
+        "first_name": "Betty",
+        "last_name": "Hernandez",
+        "email": "betty.hernandez68@example.com"
+      },
+      {
+        "customer_id": 137,
+        "first_name": "Donald",
+        "last_name": "Hernandez",
+        "email": "donald.hernandez136@example.com"
+      },
+      {
+        "customer_id": 37,
+        "first_name": "Donna",
+        "last_name": "Hernandez",
+        "email": "donna.hernandez36@example.com"
+      },
+      {
+        "customer_id": 89,
+        "first_name": "Daniel",
+        "last_name": "Jackson",
+        "email": "daniel.jackson88@example.com"
+      },
+      {
+        "customer_id": 136,
+        "first_name": "Nancy",
+        "last_name": "Jackson",
+        "email": "nancy.jackson135@example.com"
+      },
+      {
+        "customer_id": 176,
+        "first_name": "Robert",
+        "last_name": "Jackson",
+        "email": "robert.jackson175@example.com"
+      },
+      {
+        "customer_id": 76,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "email": "anthony.johnson75@example.com"
+      },
+      {
+        "customer_id": 157,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "email": "anthony.johnson156@example.com"
+      },
+      {
+        "customer_id": 86,
+        "first_name": "Daniel",
+        "last_name": "Johnson",
+        "email": "daniel.johnson85@example.com"
+      },
+      {
+        "customer_id": 148,
+        "first_name": "John",
+        "last_name": "Jones",
+        "email": "john.jones147@example.com"
+      },
+      {
+        "customer_id": 30,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "email": "thomas.jones29@example.com"
+      },
+      {
+        "customer_id": 186,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "email": "thomas.jones185@example.com"
+      },
+      {
+        "customer_id": 78,
+        "first_name": "Anthony",
+        "last_name": "King",
+        "email": "anthony.king77@example.com"
+      },
+      {
+        "customer_id": 151,
+        "first_name": "Daniel",
+        "last_name": "King",
+        "email": "daniel.king150@example.com"
+      },
+      {
+        "customer_id": 147,
+        "first_name": "Helen",
+        "last_name": "King",
+        "email": "helen.king146@example.com"
+      },
+      {
+        "customer_id": 179,
+        "first_name": "John",
+        "last_name": "King",
+        "email": "john.king178@example.com"
+      },
+      {
+        "customer_id": 172,
+        "first_name": "Mark",
+        "last_name": "King",
+        "email": "mark.king171@example.com"
+      },
+      {
+        "customer_id": 45,
+        "first_name": "Richard",
+        "last_name": "King",
+        "email": "richard.king44@example.com"
+      },
+      {
+        "customer_id": 109,
+        "first_name": "Susan",
+        "last_name": "King",
+        "email": "susan.king108@example.com"
+      },
+      {
+        "customer_id": 111,
+        "first_name": "Anthony",
+        "last_name": "Lee",
+        "email": "anthony.lee110@example.com"
+      },
+      {
+        "customer_id": 117,
+        "first_name": "Charles",
+        "last_name": "Lee",
+        "email": "charles.lee116@example.com"
+      },
+      {
+        "customer_id": 195,
+        "first_name": "Mary",
+        "last_name": "Lee",
+        "email": "mary.lee194@example.com"
+      },
+      {
+        "customer_id": 95,
+        "first_name": "David",
+        "last_name": "Lewis",
+        "email": "david.lewis94@example.com"
+      },
+      {
+        "customer_id": 24,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "email": "jennifer.lewis23@example.com"
+      },
+      {
+        "customer_id": 110,
+        "first_name": "Anthony",
+        "last_name": "Lopez",
+        "email": "anthony.lopez109@example.com"
+      },
+      {
+        "customer_id": 34,
+        "first_name": "Christopher",
+        "last_name": "Lopez",
+        "email": "christopher.lopez33@example.com"
+      },
+      {
+        "customer_id": 143,
+        "first_name": "David",
+        "last_name": "Lopez",
+        "email": "david.lopez142@example.com"
+      },
+      {
+        "customer_id": 40,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "email": "donald.lopez39@example.com"
+      },
+      {
+        "customer_id": 190,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "email": "donald.lopez189@example.com"
+      },
+      {
+        "customer_id": 181,
+        "first_name": "Matthew",
+        "last_name": "Lopez",
+        "email": "matthew.lopez180@example.com"
+      },
+      {
+        "customer_id": 51,
+        "first_name": "William",
+        "last_name": "Lopez",
+        "email": "william.lopez50@example.com"
+      },
+      {
+        "customer_id": 121,
+        "first_name": "Barbara",
+        "last_name": "Martin",
+        "email": "barbara.martin120@example.com"
+      },
+      {
+        "customer_id": 125,
+        "first_name": "David",
+        "last_name": "Martin",
+        "email": "david.martin124@example.com"
+      },
+      {
+        "customer_id": 59,
+        "first_name": "Betty",
+        "last_name": "Martinez",
+        "email": "betty.martinez58@example.com"
+      },
+      {
+        "customer_id": 48,
+        "first_name": "John",
+        "last_name": "Martinez",
+        "email": "john.martinez47@example.com"
+      },
+      {
+        "customer_id": 187,
+        "first_name": "William",
+        "last_name": "Martinez",
+        "email": "william.martinez186@example.com"
+      },
+      {
+        "customer_id": 112,
+        "first_name": "Anthony",
+        "last_name": "Miller",
+        "email": "anthony.miller111@example.com"
+      },
+      {
+        "customer_id": 21,
+        "first_name": "Richard",
+        "last_name": "Miller",
+        "email": "richard.miller20@example.com"
+      },
+      {
+        "customer_id": 42,
+        "first_name": "James",
+        "last_name": "Moore",
+        "email": "james.moore41@example.com"
+      },
+      {
+        "customer_id": 120,
+        "first_name": "John",
+        "last_name": "Moore",
+        "email": "john.moore119@example.com"
+      },
+      {
+        "customer_id": 53,
+        "first_name": "Charles",
+        "last_name": "Robinson",
+        "email": "charles.robinson52@example.com"
+      },
+      {
+        "customer_id": 68,
+        "first_name": "Daniel",
+        "last_name": "Robinson",
+        "email": "daniel.robinson67@example.com"
+      },
+      {
+        "customer_id": 57,
+        "first_name": "David",
+        "last_name": "Robinson",
+        "email": "david.robinson56@example.com"
+      },
+      {
+        "customer_id": 197,
+        "first_name": "Nancy",
+        "last_name": "Robinson",
+        "email": "nancy.robinson196@example.com"
+      },
+      {
+        "customer_id": 85,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "email": "barbara.rodriguez84@example.com"
+      },
+      {
+        "customer_id": 100,
+        "first_name": "Betty",
+        "last_name": "Smith",
+        "email": "betty.smith99@example.com"
+      },
+      {
+        "customer_id": 106,
+        "first_name": "Christopher",
+        "last_name": "Smith",
+        "email": "christopher.smith105@example.com"
+      },
+      {
+        "customer_id": 12,
+        "first_name": "Helen",
+        "last_name": "Smith",
+        "email": "helen.smith11@example.com"
+      },
+      {
+        "customer_id": 87,
+        "first_name": "Joseph",
+        "last_name": "Smith",
+        "email": "joseph.smith86@example.com"
+      },
+      {
+        "customer_id": 79,
+        "first_name": "Barbara",
+        "last_name": "Taylor",
+        "email": "barbara.taylor78@example.com"
+      },
+      {
+        "customer_id": 98,
+        "first_name": "Charles",
+        "last_name": "Taylor",
+        "email": "charles.taylor97@example.com"
+      },
+      {
+        "customer_id": 153,
+        "first_name": "Elizabeth",
+        "last_name": "Taylor",
+        "email": "elizabeth.taylor152@example.com"
+      },
+      {
+        "customer_id": 119,
+        "first_name": "Nancy",
+        "last_name": "Taylor",
+        "email": "nancy.taylor118@example.com"
+      },
+      {
+        "customer_id": 130,
+        "first_name": "James",
+        "last_name": "Thomas",
+        "email": "james.thomas129@example.com"
+      },
+      {
+        "customer_id": 55,
+        "first_name": "Patricia",
+        "last_name": "Thomas",
+        "email": "patricia.thomas54@example.com"
+      },
+      {
+        "customer_id": 6,
+        "first_name": "Thomas",
+        "last_name": "Thomas",
+        "email": "thomas.thomas5@example.com"
+      },
+      {
+        "customer_id": 73,
+        "first_name": "Patricia",
+        "last_name": "Thompson",
+        "email": "patricia.thompson72@example.com"
+      },
+      {
+        "customer_id": 159,
+        "first_name": "Charles",
+        "last_name": "Walker",
+        "email": "charles.walker158@example.com"
+      },
+      {
+        "customer_id": 129,
+        "first_name": "John",
+        "last_name": "Walker",
+        "email": "john.walker128@example.com"
+      },
+      {
+        "customer_id": 44,
+        "first_name": "Joseph",
+        "last_name": "Walker",
+        "email": "joseph.walker43@example.com"
+      },
+      {
+        "customer_id": 8,
+        "first_name": "Karen",
+        "last_name": "Walker",
+        "email": "karen.walker7@example.com"
+      },
+      {
+        "customer_id": 167,
+        "first_name": "Matthew",
+        "last_name": "Walker",
+        "email": "matthew.walker166@example.com"
+      },
+      {
+        "customer_id": 83,
+        "first_name": "Helen",
+        "last_name": "White",
+        "email": "helen.white82@example.com"
+      },
+      {
+        "customer_id": 131,
+        "first_name": "Karen",
+        "last_name": "White",
+        "email": "karen.white130@example.com"
+      },
+      {
+        "customer_id": 9,
+        "first_name": "Mark",
+        "last_name": "White",
+        "email": "mark.white8@example.com"
+      },
+      {
+        "customer_id": 164,
+        "first_name": "Nancy",
+        "last_name": "White",
+        "email": "nancy.white163@example.com"
+      },
+      {
+        "customer_id": 50,
+        "first_name": "Christopher",
+        "last_name": "Williams",
+        "email": "christopher.williams49@example.com"
+      },
+      {
+        "customer_id": 93,
+        "first_name": "Daniel",
+        "last_name": "Williams",
+        "email": "daniel.williams92@example.com"
+      },
+      {
+        "customer_id": 54,
+        "first_name": "John",
+        "last_name": "Williams",
+        "email": "john.williams53@example.com"
+      },
+      {
+        "customer_id": 132,
+        "first_name": "William",
+        "last_name": "Williams",
+        "email": "william.williams131@example.com"
+      },
+      {
+        "customer_id": 35,
+        "first_name": "Donna",
+        "last_name": "Wilson",
+        "email": "donna.wilson34@example.com"
+      },
+      {
+        "customer_id": 171,
+        "first_name": "Sarah",
+        "last_name": "Wilson",
+        "email": "sarah.wilson170@example.com"
+      },
+      {
+        "customer_id": 10,
+        "first_name": "Thomas",
+        "last_name": "Wilson",
+        "email": "thomas.wilson9@example.com"
+      },
+      {
+        "customer_id": 196,
+        "first_name": "Patricia",
+        "last_name": "Young",
+        "email": "patricia.young195@example.com"
+      }
+    ],
+    "tags": [
+      "subquery",
+      "exists",
+      "join"
+    ],
+    "created_at": "2025-12-13T17:21:27.474514"
+  },
+  {
+    "id": "window_function",
+    "question": "Rank customers by total spending and show their spending percentile",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "enterprise",
+    "gold_sql": "\n            SELECT \n                customer_id,\n                first_name,\n                last_name,\n                total_spent,\n                RANK() OVER (ORDER BY total_spent DESC) as spending_rank,\n                PERCENT_RANK() OVER (ORDER BY total_spent DESC) as spending_percentile\n            FROM (\n                SELECT \n                    c.customer_id,\n                    c.first_name,\n                    c.last_name,\n                    COALESCE(SUM(o.total_amount), 0) as total_spent\n                FROM customers c\n                LEFT JOIN orders o ON c.customer_id = o.customer_id\n                WHERE o.order_status != 'cancelled' OR o.order_id IS NULL\n                GROUP BY c.customer_id, c.first_name, c.last_name\n            ) customer_spending\n            ORDER BY spending_rank\n            ",
+    "expected_result": [
+      {
+        "customer_id": 179,
+        "first_name": "John",
+        "last_name": "King",
+        "total_spent": 1536.95,
+        "spending_rank": 1,
+        "spending_percentile": 0.0
+      },
+      {
+        "customer_id": 95,
+        "first_name": "David",
+        "last_name": "Lewis",
+        "total_spent": 1283.72,
+        "spending_rank": 2,
+        "spending_percentile": 0.005076142131979695
+      },
+      {
+        "customer_id": 100,
+        "first_name": "Betty",
+        "last_name": "Smith",
+        "total_spent": 1275.77,
+        "spending_rank": 3,
+        "spending_percentile": 0.01015228426395939
+      },
+      {
+        "customer_id": 162,
+        "first_name": "Helen",
+        "last_name": "Brown",
+        "total_spent": 1188.11,
+        "spending_rank": 4,
+        "spending_percentile": 0.015228426395939087
+      },
+      {
+        "customer_id": 157,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "total_spent": 1173.04,
+        "spending_rank": 5,
+        "spending_percentile": 0.02030456852791878
+      },
+      {
+        "customer_id": 91,
+        "first_name": "Patricia",
+        "last_name": "Gonzalez",
+        "total_spent": 1162.78,
+        "spending_rank": 6,
+        "spending_percentile": 0.025380710659898477
+      },
+      {
+        "customer_id": 121,
+        "first_name": "Barbara",
+        "last_name": "Martin",
+        "total_spent": 1090.63,
+        "spending_rank": 7,
+        "spending_percentile": 0.030456852791878174
+      },
+      {
+        "customer_id": 143,
+        "first_name": "David",
+        "last_name": "Lopez",
+        "total_spent": 1078.6,
+        "spending_rank": 8,
+        "spending_percentile": 0.03553299492385787
+      },
+      {
+        "customer_id": 163,
+        "first_name": "James",
+        "last_name": "Gonzalez",
+        "total_spent": 1041.56,
+        "spending_rank": 9,
+        "spending_percentile": 0.04060913705583756
+      },
+      {
+        "customer_id": 154,
+        "first_name": "Nancy",
+        "last_name": "Lewis",
+        "total_spent": 1016.5,
+        "spending_rank": 10,
+        "spending_percentile": 0.04568527918781726
+      },
+      {
+        "customer_id": 130,
+        "first_name": "James",
+        "last_name": "Thomas",
+        "total_spent": 1012.19,
+        "spending_rank": 11,
+        "spending_percentile": 0.050761421319796954
+      },
+      {
+        "customer_id": 79,
+        "first_name": "Barbara",
+        "last_name": "Taylor",
+        "total_spent": 986.96,
+        "spending_rank": 12,
+        "spending_percentile": 0.05583756345177665
+      },
+      {
+        "customer_id": 14,
+        "first_name": "Jennifer",
+        "last_name": "Brown",
+        "total_spent": 967.26,
+        "spending_rank": 13,
+        "spending_percentile": 0.06091370558375635
+      },
+      {
+        "customer_id": 29,
+        "first_name": "Donna",
+        "last_name": "Thompson",
+        "total_spent": 960.74,
+        "spending_rank": 14,
+        "spending_percentile": 0.06598984771573604
+      },
+      {
+        "customer_id": 167,
+        "first_name": "Matthew",
+        "last_name": "Walker",
+        "total_spent": 942.4,
+        "spending_rank": 15,
+        "spending_percentile": 0.07106598984771574
+      },
+      {
+        "customer_id": 147,
+        "first_name": "Helen",
+        "last_name": "King",
+        "total_spent": 939.78,
+        "spending_rank": 16,
+        "spending_percentile": 0.07614213197969544
+      },
+      {
+        "customer_id": 129,
+        "first_name": "John",
+        "last_name": "Walker",
+        "total_spent": 935.32,
+        "spending_rank": 17,
+        "spending_percentile": 0.08121827411167512
+      },
+      {
+        "customer_id": 60,
+        "first_name": "Barbara",
+        "last_name": "Davis",
+        "total_spent": 922.22,
+        "spending_rank": 18,
+        "spending_percentile": 0.08629441624365482
+      },
+      {
+        "customer_id": 11,
+        "first_name": "Michael",
+        "last_name": "Gonzalez",
+        "total_spent": 906.35,
+        "spending_rank": 19,
+        "spending_percentile": 0.09137055837563451
+      },
+      {
+        "customer_id": 24,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "total_spent": 876.02,
+        "spending_rank": 20,
+        "spending_percentile": 0.09644670050761421
+      },
+      {
+        "customer_id": 111,
+        "first_name": "Anthony",
+        "last_name": "Lee",
+        "total_spent": 867.94,
+        "spending_rank": 21,
+        "spending_percentile": 0.10152284263959391
+      },
+      {
+        "customer_id": 61,
+        "first_name": "Charles",
+        "last_name": "Allen",
+        "total_spent": 860.02,
+        "spending_rank": 22,
+        "spending_percentile": 0.1065989847715736
+      },
+      {
+        "customer_id": 39,
+        "first_name": "Charles",
+        "last_name": "Brown",
+        "total_spent": 832.97,
+        "spending_rank": 23,
+        "spending_percentile": 0.1116751269035533
+      },
+      {
+        "customer_id": 56,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "total_spent": 811.12,
+        "spending_rank": 24,
+        "spending_percentile": 0.116751269035533
+      },
+      {
+        "customer_id": 85,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "total_spent": 806.14,
+        "spending_rank": 25,
+        "spending_percentile": 0.1218274111675127
+      },
+      {
+        "customer_id": 55,
+        "first_name": "Patricia",
+        "last_name": "Thomas",
+        "total_spent": 798.71,
+        "spending_rank": 26,
+        "spending_percentile": 0.12690355329949238
+      },
+      {
+        "customer_id": 173,
+        "first_name": "Linda",
+        "last_name": "Taylor",
+        "total_spent": 785.17,
+        "spending_rank": 27,
+        "spending_percentile": 0.1319796954314721
+      },
+      {
+        "customer_id": 67,
+        "first_name": "Jessica",
+        "last_name": "Garcia",
+        "total_spent": 779.75,
+        "spending_rank": 28,
+        "spending_percentile": 0.13705583756345177
+      },
+      {
+        "customer_id": 190,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "total_spent": 774.41,
+        "spending_rank": 29,
+        "spending_percentile": 0.14213197969543148
+      },
+      {
+        "customer_id": 43,
+        "first_name": "Christopher",
+        "last_name": "Anderson",
+        "total_spent": 741.75,
+        "spending_rank": 30,
+        "spending_percentile": 0.14720812182741116
+      },
+      {
+        "customer_id": 151,
+        "first_name": "Daniel",
+        "last_name": "King",
+        "total_spent": 741.09,
+        "spending_rank": 31,
+        "spending_percentile": 0.15228426395939088
+      },
+      {
+        "customer_id": 172,
+        "first_name": "Mark",
+        "last_name": "King",
+        "total_spent": 732.76,
+        "spending_rank": 32,
+        "spending_percentile": 0.15736040609137056
+      },
+      {
+        "customer_id": 196,
+        "first_name": "Patricia",
+        "last_name": "Young",
+        "total_spent": 728.66,
+        "spending_rank": 33,
+        "spending_percentile": 0.16243654822335024
+      },
+      {
+        "customer_id": 153,
+        "first_name": "Elizabeth",
+        "last_name": "Taylor",
+        "total_spent": 708.04,
+        "spending_rank": 34,
+        "spending_percentile": 0.16751269035532995
+      },
+      {
+        "customer_id": 40,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "total_spent": 693.51,
+        "spending_rank": 35,
+        "spending_percentile": 0.17258883248730963
+      },
+      {
+        "customer_id": 155,
+        "first_name": "Jessica",
+        "last_name": "Harris",
+        "total_spent": 672.37,
+        "spending_rank": 36,
+        "spending_percentile": 0.17766497461928935
+      },
+      {
+        "customer_id": 197,
+        "first_name": "Nancy",
+        "last_name": "Robinson",
+        "total_spent": 671.49,
+        "spending_rank": 37,
+        "spending_percentile": 0.18274111675126903
+      },
+      {
+        "customer_id": 176,
+        "first_name": "Robert",
+        "last_name": "Jackson",
+        "total_spent": 670.02,
+        "spending_rank": 38,
+        "spending_percentile": 0.18781725888324874
+      },
+      {
+        "customer_id": 87,
+        "first_name": "Joseph",
+        "last_name": "Smith",
+        "total_spent": 669.26,
+        "spending_rank": 39,
+        "spending_percentile": 0.19289340101522842
+      },
+      {
+        "customer_id": 96,
+        "first_name": "Jennifer",
+        "last_name": "Rodriguez",
+        "total_spent": 667.74,
+        "spending_rank": 40,
+        "spending_percentile": 0.19796954314720813
+      },
+      {
+        "customer_id": 89,
+        "first_name": "Daniel",
+        "last_name": "Jackson",
+        "total_spent": 652.42,
+        "spending_rank": 41,
+        "spending_percentile": 0.20304568527918782
+      },
+      {
+        "customer_id": 44,
+        "first_name": "Joseph",
+        "last_name": "Walker",
+        "total_spent": 648.22,
+        "spending_rank": 42,
+        "spending_percentile": 0.20812182741116753
+      },
+      {
+        "customer_id": 156,
+        "first_name": "Donald",
+        "last_name": "Harris",
+        "total_spent": 647.14,
+        "spending_rank": 43,
+        "spending_percentile": 0.2131979695431472
+      },
+      {
+        "customer_id": 73,
+        "first_name": "Patricia",
+        "last_name": "Thompson",
+        "total_spent": 645.63,
+        "spending_rank": 44,
+        "spending_percentile": 0.2182741116751269
+      },
+      {
+        "customer_id": 198,
+        "first_name": "Matthew",
+        "last_name": "Hernandez",
+        "total_spent": 622.92,
+        "spending_rank": 45,
+        "spending_percentile": 0.2233502538071066
+      },
+      {
+        "customer_id": 92,
+        "first_name": "Nancy",
+        "last_name": "Smith",
+        "total_spent": 615.78,
+        "spending_rank": 46,
+        "spending_percentile": 0.22842639593908629
+      },
+      {
+        "customer_id": 12,
+        "first_name": "Helen",
+        "last_name": "Smith",
+        "total_spent": 608.31,
+        "spending_rank": 47,
+        "spending_percentile": 0.233502538071066
+      },
+      {
+        "customer_id": 47,
+        "first_name": "Karen",
+        "last_name": "Harris",
+        "total_spent": 607.38,
+        "spending_rank": 48,
+        "spending_percentile": 0.23857868020304568
+      },
+      {
+        "customer_id": 148,
+        "first_name": "John",
+        "last_name": "Jones",
+        "total_spent": 607.04,
+        "spending_rank": 49,
+        "spending_percentile": 0.2436548223350254
+      },
+      {
+        "customer_id": 69,
+        "first_name": "Betty",
+        "last_name": "Hernandez",
+        "total_spent": 606.58,
+        "spending_rank": 50,
+        "spending_percentile": 0.24873096446700507
+      },
+      {
+        "customer_id": 119,
+        "first_name": "Nancy",
+        "last_name": "Taylor",
+        "total_spent": 605.72,
+        "spending_rank": 51,
+        "spending_percentile": 0.25380710659898476
+      },
+      {
+        "customer_id": 42,
+        "first_name": "James",
+        "last_name": "Moore",
+        "total_spent": 602.05,
+        "spending_rank": 52,
+        "spending_percentile": 0.25888324873096447
+      },
+      {
+        "customer_id": 149,
+        "first_name": "Christopher",
+        "last_name": "Gonzalez",
+        "total_spent": 601.93,
+        "spending_rank": 53,
+        "spending_percentile": 0.2639593908629442
+      },
+      {
+        "customer_id": 34,
+        "first_name": "Christopher",
+        "last_name": "Lopez",
+        "total_spent": 595.57,
+        "spending_rank": 54,
+        "spending_percentile": 0.26903553299492383
+      },
+      {
+        "customer_id": 133,
+        "first_name": "Sandra",
+        "last_name": "Anderson",
+        "total_spent": 593.28,
+        "spending_rank": 55,
+        "spending_percentile": 0.27411167512690354
+      },
+      {
+        "customer_id": 30,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "total_spent": 590.57,
+        "spending_rank": 56,
+        "spending_percentile": 0.27918781725888325
+      },
+      {
+        "customer_id": 6,
+        "first_name": "Thomas",
+        "last_name": "Thomas",
+        "total_spent": 585.51,
+        "spending_rank": 57,
+        "spending_percentile": 0.28426395939086296
+      },
+      {
+        "customer_id": 53,
+        "first_name": "Charles",
+        "last_name": "Robinson",
+        "total_spent": 584.76,
+        "spending_rank": 58,
+        "spending_percentile": 0.2893401015228426
+      },
+      {
+        "customer_id": 64,
+        "first_name": "Lisa",
+        "last_name": "Brown",
+        "total_spent": 572.05,
+        "spending_rank": 59,
+        "spending_percentile": 0.29441624365482233
+      },
+      {
+        "customer_id": 8,
+        "first_name": "Karen",
+        "last_name": "Walker",
+        "total_spent": 572.02,
+        "spending_rank": 60,
+        "spending_percentile": 0.29949238578680204
+      },
+      {
+        "customer_id": 158,
+        "first_name": "Anthony",
+        "last_name": "Hernandez",
+        "total_spent": 557.26,
+        "spending_rank": 61,
+        "spending_percentile": 0.30456852791878175
+      },
+      {
+        "customer_id": 159,
+        "first_name": "Charles",
+        "last_name": "Walker",
+        "total_spent": 555.31,
+        "spending_rank": 62,
+        "spending_percentile": 0.3096446700507614
+      },
+      {
+        "customer_id": 174,
+        "first_name": "Anthony",
+        "last_name": "Rodriguez",
+        "total_spent": 548.84,
+        "spending_rank": 63,
+        "spending_percentile": 0.3147208121827411
+      },
+      {
+        "customer_id": 109,
+        "first_name": "Susan",
+        "last_name": "King",
+        "total_spent": 547.77,
+        "spending_rank": 64,
+        "spending_percentile": 0.3197969543147208
+      },
+      {
+        "customer_id": 160,
+        "first_name": "Lisa",
+        "last_name": "Taylor",
+        "total_spent": 547.41,
+        "spending_rank": 65,
+        "spending_percentile": 0.3248730964467005
+      },
+      {
+        "customer_id": 52,
+        "first_name": "Linda",
+        "last_name": "Walker",
+        "total_spent": 546.2,
+        "spending_rank": 66,
+        "spending_percentile": 0.3299492385786802
+      },
+      {
+        "customer_id": 125,
+        "first_name": "David",
+        "last_name": "Martin",
+        "total_spent": 541.82,
+        "spending_rank": 67,
+        "spending_percentile": 0.3350253807106599
+      },
+      {
+        "customer_id": 145,
+        "first_name": "Patricia",
+        "last_name": "Clark",
+        "total_spent": 540.46,
+        "spending_rank": 68,
+        "spending_percentile": 0.3401015228426396
+      },
+      {
+        "customer_id": 181,
+        "first_name": "Matthew",
+        "last_name": "Lopez",
+        "total_spent": 535.32,
+        "spending_rank": 69,
+        "spending_percentile": 0.34517766497461927
+      },
+      {
+        "customer_id": 78,
+        "first_name": "Anthony",
+        "last_name": "King",
+        "total_spent": 533.99,
+        "spending_rank": 70,
+        "spending_percentile": 0.350253807106599
+      },
+      {
+        "customer_id": 113,
+        "first_name": "David",
+        "last_name": "Harris",
+        "total_spent": 530.8,
+        "spending_rank": 71,
+        "spending_percentile": 0.3553299492385787
+      },
+      {
+        "customer_id": 106,
+        "first_name": "Christopher",
+        "last_name": "Smith",
+        "total_spent": 516.88,
+        "spending_rank": 72,
+        "spending_percentile": 0.3604060913705584
+      },
+      {
+        "customer_id": 183,
+        "first_name": "Donna",
+        "last_name": "Gonzalez",
+        "total_spent": 501.38,
+        "spending_rank": 73,
+        "spending_percentile": 0.36548223350253806
+      },
+      {
+        "customer_id": 17,
+        "first_name": "Helen",
+        "last_name": "Garcia",
+        "total_spent": 495.92,
+        "spending_rank": 74,
+        "spending_percentile": 0.37055837563451777
+      },
+      {
+        "customer_id": 80,
+        "first_name": "Sandra",
+        "last_name": "Brown",
+        "total_spent": 491.23,
+        "spending_rank": 75,
+        "spending_percentile": 0.3756345177664975
+      },
+      {
+        "customer_id": 5,
+        "first_name": "Joseph",
+        "last_name": "Anderson",
+        "total_spent": 479.09,
+        "spending_rank": 76,
+        "spending_percentile": 0.38071065989847713
+      },
+      {
+        "customer_id": 195,
+        "first_name": "Mary",
+        "last_name": "Lee",
+        "total_spent": 478.69,
+        "spending_rank": 77,
+        "spending_percentile": 0.38578680203045684
+      },
+      {
+        "customer_id": 37,
+        "first_name": "Donna",
+        "last_name": "Hernandez",
+        "total_spent": 478.56,
+        "spending_rank": 78,
+        "spending_percentile": 0.39086294416243655
+      },
+      {
+        "customer_id": 57,
+        "first_name": "David",
+        "last_name": "Robinson",
+        "total_spent": 474.98,
+        "spending_rank": 79,
+        "spending_percentile": 0.39593908629441626
+      },
+      {
+        "customer_id": 35,
+        "first_name": "Donna",
+        "last_name": "Wilson",
+        "total_spent": 471.01,
+        "spending_rank": 80,
+        "spending_percentile": 0.4010152284263959
+      },
+      {
+        "customer_id": 86,
+        "first_name": "Daniel",
+        "last_name": "Johnson",
+        "total_spent": 470.67,
+        "spending_rank": 81,
+        "spending_percentile": 0.40609137055837563
+      },
+      {
+        "customer_id": 189,
+        "first_name": "David",
+        "last_name": "Smith",
+        "total_spent": 466.94,
+        "spending_rank": 82,
+        "spending_percentile": 0.41116751269035534
+      },
+      {
+        "customer_id": 59,
+        "first_name": "Betty",
+        "last_name": "Martinez",
+        "total_spent": 465.75,
+        "spending_rank": 83,
+        "spending_percentile": 0.41624365482233505
+      },
+      {
+        "customer_id": 123,
+        "first_name": "John",
+        "last_name": "Wilson",
+        "total_spent": 463.9,
+        "spending_rank": 84,
+        "spending_percentile": 0.4213197969543147
+      },
+      {
+        "customer_id": 126,
+        "first_name": "Susan",
+        "last_name": "Young",
+        "total_spent": 461.01,
+        "spending_rank": 85,
+        "spending_percentile": 0.4263959390862944
+      },
+      {
+        "customer_id": 27,
+        "first_name": "Jennifer",
+        "last_name": "Gonzalez",
+        "total_spent": 460.08,
+        "spending_rank": 86,
+        "spending_percentile": 0.43147208121827413
+      },
+      {
+        "customer_id": 83,
+        "first_name": "Helen",
+        "last_name": "White",
+        "total_spent": 454.82,
+        "spending_rank": 87,
+        "spending_percentile": 0.4365482233502538
+      },
+      {
+        "customer_id": 32,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "total_spent": 451.56,
+        "spending_rank": 88,
+        "spending_percentile": 0.4416243654822335
+      },
+      {
+        "customer_id": 170,
+        "first_name": "Lisa",
+        "last_name": "Clark",
+        "total_spent": 449.43,
+        "spending_rank": 89,
+        "spending_percentile": 0.4467005076142132
+      },
+      {
+        "customer_id": 178,
+        "first_name": "James",
+        "last_name": "Anderson",
+        "total_spent": 444.35,
+        "spending_rank": 90,
+        "spending_percentile": 0.4517766497461929
+      },
+      {
+        "customer_id": 62,
+        "first_name": "Sandra",
+        "last_name": "Johnson",
+        "total_spent": 439.51,
+        "spending_rank": 91,
+        "spending_percentile": 0.45685279187817257
+      },
+      {
+        "customer_id": 45,
+        "first_name": "Richard",
+        "last_name": "King",
+        "total_spent": 435.98,
+        "spending_rank": 92,
+        "spending_percentile": 0.4619289340101523
+      },
+      {
+        "customer_id": 105,
+        "first_name": "Thomas",
+        "last_name": "Allen",
+        "total_spent": 435.32,
+        "spending_rank": 93,
+        "spending_percentile": 0.467005076142132
+      },
+      {
+        "customer_id": 192,
+        "first_name": "Donald",
+        "last_name": "Clark",
+        "total_spent": 431.94,
+        "spending_rank": 94,
+        "spending_percentile": 0.4720812182741117
+      },
+      {
+        "customer_id": 54,
+        "first_name": "John",
+        "last_name": "Williams",
+        "total_spent": 426.52,
+        "spending_rank": 95,
+        "spending_percentile": 0.47715736040609136
+      },
+      {
+        "customer_id": 188,
+        "first_name": "Patricia",
+        "last_name": "Davis",
+        "total_spent": 424.94,
+        "spending_rank": 96,
+        "spending_percentile": 0.48223350253807107
+      },
+      {
+        "customer_id": 112,
+        "first_name": "Anthony",
+        "last_name": "Miller",
+        "total_spent": 423.12,
+        "spending_rank": 97,
+        "spending_percentile": 0.4873096446700508
+      },
+      {
+        "customer_id": 49,
+        "first_name": "John",
+        "last_name": "Walker",
+        "total_spent": 414.35,
+        "spending_rank": 98,
+        "spending_percentile": 0.49238578680203043
+      },
+      {
+        "customer_id": 68,
+        "first_name": "Daniel",
+        "last_name": "Robinson",
+        "total_spent": 411.53,
+        "spending_rank": 99,
+        "spending_percentile": 0.49746192893401014
+      },
+      {
+        "customer_id": 136,
+        "first_name": "Nancy",
+        "last_name": "Jackson",
+        "total_spent": 409.4,
+        "spending_rank": 100,
+        "spending_percentile": 0.5025380710659898
+      },
+      {
+        "customer_id": 185,
+        "first_name": "Mary",
+        "last_name": "Taylor",
+        "total_spent": 408.83,
+        "spending_rank": 101,
+        "spending_percentile": 0.5076142131979695
+      },
+      {
+        "customer_id": 51,
+        "first_name": "William",
+        "last_name": "Lopez",
+        "total_spent": 401.54,
+        "spending_rank": 102,
+        "spending_percentile": 0.5126903553299492
+      },
+      {
+        "customer_id": 9,
+        "first_name": "Mark",
+        "last_name": "White",
+        "total_spent": 400.54,
+        "spending_rank": 103,
+        "spending_percentile": 0.5177664974619289
+      },
+      {
+        "customer_id": 171,
+        "first_name": "Sarah",
+        "last_name": "Wilson",
+        "total_spent": 383.58,
+        "spending_rank": 104,
+        "spending_percentile": 0.5228426395939086
+      },
+      {
+        "customer_id": 3,
+        "first_name": "James",
+        "last_name": "Jones",
+        "total_spent": 381.2,
+        "spending_rank": 105,
+        "spending_percentile": 0.5279187817258884
+      },
+      {
+        "customer_id": 4,
+        "first_name": "Sarah",
+        "last_name": "Moore",
+        "total_spent": 381.2,
+        "spending_rank": 105,
+        "spending_percentile": 0.5279187817258884
+      },
+      {
+        "customer_id": 144,
+        "first_name": "Matthew",
+        "last_name": "Wilson",
+        "total_spent": 379.42,
+        "spending_rank": 107,
+        "spending_percentile": 0.5380710659898477
+      },
+      {
+        "customer_id": 169,
+        "first_name": "Barbara",
+        "last_name": "Jones",
+        "total_spent": 379.09,
+        "spending_rank": 108,
+        "spending_percentile": 0.5431472081218274
+      },
+      {
+        "customer_id": 120,
+        "first_name": "John",
+        "last_name": "Moore",
+        "total_spent": 372.05,
+        "spending_rank": 109,
+        "spending_percentile": 0.5482233502538071
+      },
+      {
+        "customer_id": 19,
+        "first_name": "Daniel",
+        "last_name": "Harris",
+        "total_spent": 349.31,
+        "spending_rank": 110,
+        "spending_percentile": 0.5532994923857868
+      },
+      {
+        "customer_id": 110,
+        "first_name": "Anthony",
+        "last_name": "Lopez",
+        "total_spent": 348.48,
+        "spending_rank": 111,
+        "spending_percentile": 0.5583756345177665
+      },
+      {
+        "customer_id": 127,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "total_spent": 348.14,
+        "spending_rank": 112,
+        "spending_percentile": 0.5634517766497462
+      },
+      {
+        "customer_id": 104,
+        "first_name": "Jessica",
+        "last_name": "Anderson",
+        "total_spent": 344.18,
+        "spending_rank": 113,
+        "spending_percentile": 0.5685279187817259
+      },
+      {
+        "customer_id": 187,
+        "first_name": "William",
+        "last_name": "Martinez",
+        "total_spent": 339.36,
+        "spending_rank": 114,
+        "spending_percentile": 0.5736040609137056
+      },
+      {
+        "customer_id": 101,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "total_spent": 335.13,
+        "spending_rank": 115,
+        "spending_percentile": 0.5786802030456852
+      },
+      {
+        "customer_id": 23,
+        "first_name": "Matthew",
+        "last_name": "Jackson",
+        "total_spent": 329.48,
+        "spending_rank": 116,
+        "spending_percentile": 0.583756345177665
+      },
+      {
+        "customer_id": 38,
+        "first_name": "Donald",
+        "last_name": "Martin",
+        "total_spent": 328.49,
+        "spending_rank": 117,
+        "spending_percentile": 0.5888324873096447
+      },
+      {
+        "customer_id": 175,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "total_spent": 328.2,
+        "spending_rank": 118,
+        "spending_percentile": 0.5939086294416244
+      },
+      {
+        "customer_id": 137,
+        "first_name": "Donald",
+        "last_name": "Hernandez",
+        "total_spent": 322.76,
+        "spending_rank": 119,
+        "spending_percentile": 0.5989847715736041
+      },
+      {
+        "customer_id": 46,
+        "first_name": "Mark",
+        "last_name": "Jackson",
+        "total_spent": 314.39,
+        "spending_rank": 120,
+        "spending_percentile": 0.6040609137055838
+      },
+      {
+        "customer_id": 184,
+        "first_name": "Christopher",
+        "last_name": "Martinez",
+        "total_spent": 309.22,
+        "spending_rank": 121,
+        "spending_percentile": 0.6091370558375635
+      },
+      {
+        "customer_id": 66,
+        "first_name": "Nancy",
+        "last_name": "Walker",
+        "total_spent": 305.81,
+        "spending_rank": 122,
+        "spending_percentile": 0.6142131979695431
+      },
+      {
+        "customer_id": 194,
+        "first_name": "Susan",
+        "last_name": "Garcia",
+        "total_spent": 273.49,
+        "spending_rank": 123,
+        "spending_percentile": 0.6192893401015228
+      },
+      {
+        "customer_id": 94,
+        "first_name": "Patricia",
+        "last_name": "Williams",
+        "total_spent": 255.06,
+        "spending_rank": 124,
+        "spending_percentile": 0.6243654822335025
+      },
+      {
+        "customer_id": 90,
+        "first_name": "Charles",
+        "last_name": "Young",
+        "total_spent": 254.79,
+        "spending_rank": 125,
+        "spending_percentile": 0.6294416243654822
+      },
+      {
+        "customer_id": 16,
+        "first_name": "Thomas",
+        "last_name": "Davis",
+        "total_spent": 246.87,
+        "spending_rank": 126,
+        "spending_percentile": 0.6345177664974619
+      },
+      {
+        "customer_id": 191,
+        "first_name": "Donna",
+        "last_name": "Brown",
+        "total_spent": 243.96,
+        "spending_rank": 127,
+        "spending_percentile": 0.6395939086294417
+      },
+      {
+        "customer_id": 164,
+        "first_name": "Nancy",
+        "last_name": "White",
+        "total_spent": 243.11,
+        "spending_rank": 128,
+        "spending_percentile": 0.6446700507614214
+      },
+      {
+        "customer_id": 131,
+        "first_name": "Karen",
+        "last_name": "White",
+        "total_spent": 240.84,
+        "spending_rank": 129,
+        "spending_percentile": 0.649746192893401
+      },
+      {
+        "customer_id": 84,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "total_spent": 239.67,
+        "spending_rank": 130,
+        "spending_percentile": 0.6548223350253807
+      },
+      {
+        "customer_id": 21,
+        "first_name": "Richard",
+        "last_name": "Miller",
+        "total_spent": 228.46,
+        "spending_rank": 131,
+        "spending_percentile": 0.6598984771573604
+      },
+      {
+        "customer_id": 165,
+        "first_name": "Linda",
+        "last_name": "Allen",
+        "total_spent": 226.67,
+        "spending_rank": 132,
+        "spending_percentile": 0.6649746192893401
+      },
+      {
+        "customer_id": 182,
+        "first_name": "Joseph",
+        "last_name": "Brown",
+        "total_spent": 224.77,
+        "spending_rank": 133,
+        "spending_percentile": 0.6700507614213198
+      },
+      {
+        "customer_id": 76,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "total_spent": 219.04,
+        "spending_rank": 134,
+        "spending_percentile": 0.6751269035532995
+      },
+      {
+        "customer_id": 98,
+        "first_name": "Charles",
+        "last_name": "Taylor",
+        "total_spent": 214.68,
+        "spending_rank": 135,
+        "spending_percentile": 0.6802030456852792
+      },
+      {
+        "customer_id": 141,
+        "first_name": "Mary",
+        "last_name": "Harris",
+        "total_spent": 212.66,
+        "spending_rank": 136,
+        "spending_percentile": 0.6852791878172588
+      },
+      {
+        "customer_id": 117,
+        "first_name": "Charles",
+        "last_name": "Lee",
+        "total_spent": 209.89,
+        "spending_rank": 137,
+        "spending_percentile": 0.6903553299492385
+      },
+      {
+        "customer_id": 10,
+        "first_name": "Thomas",
+        "last_name": "Wilson",
+        "total_spent": 199.34,
+        "spending_rank": 138,
+        "spending_percentile": 0.6954314720812182
+      },
+      {
+        "customer_id": 93,
+        "first_name": "Daniel",
+        "last_name": "Williams",
+        "total_spent": 196.44,
+        "spending_rank": 139,
+        "spending_percentile": 0.700507614213198
+      },
+      {
+        "customer_id": 186,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "total_spent": 172.06,
+        "spending_rank": 140,
+        "spending_percentile": 0.7055837563451777
+      },
+      {
+        "customer_id": 168,
+        "first_name": "Robert",
+        "last_name": "Gonzalez",
+        "total_spent": 167.32,
+        "spending_rank": 141,
+        "spending_percentile": 0.7106598984771574
+      },
+      {
+        "customer_id": 200,
+        "first_name": "Susan",
+        "last_name": "Johnson",
+        "total_spent": 160.32,
+        "spending_rank": 142,
+        "spending_percentile": 0.7157360406091371
+      },
+      {
+        "customer_id": 103,
+        "first_name": "Jessica",
+        "last_name": "Martin",
+        "total_spent": 155.94,
+        "spending_rank": 143,
+        "spending_percentile": 0.7208121827411168
+      },
+      {
+        "customer_id": 116,
+        "first_name": "Christopher",
+        "last_name": "Brown",
+        "total_spent": 154.29,
+        "spending_rank": 144,
+        "spending_percentile": 0.7258883248730964
+      },
+      {
+        "customer_id": 88,
+        "first_name": "Anthony",
+        "last_name": "Jones",
+        "total_spent": 134.94,
+        "spending_rank": 145,
+        "spending_percentile": 0.7309644670050761
+      },
+      {
+        "customer_id": 146,
+        "first_name": "Karen",
+        "last_name": "Brown",
+        "total_spent": 134.51,
+        "spending_rank": 146,
+        "spending_percentile": 0.7360406091370558
+      },
+      {
+        "customer_id": 97,
+        "first_name": "Sandra",
+        "last_name": "Smith",
+        "total_spent": 133.39,
+        "spending_rank": 147,
+        "spending_percentile": 0.7411167512690355
+      },
+      {
+        "customer_id": 48,
+        "first_name": "John",
+        "last_name": "Martinez",
+        "total_spent": 112.36,
+        "spending_rank": 148,
+        "spending_percentile": 0.7461928934010152
+      },
+      {
+        "customer_id": 193,
+        "first_name": "Daniel",
+        "last_name": "Clark",
+        "total_spent": 104.42,
+        "spending_rank": 149,
+        "spending_percentile": 0.751269035532995
+      },
+      {
+        "customer_id": 50,
+        "first_name": "Christopher",
+        "last_name": "Williams",
+        "total_spent": 93.67,
+        "spending_rank": 150,
+        "spending_percentile": 0.7563451776649747
+      },
+      {
+        "customer_id": 13,
+        "first_name": "Anthony",
+        "last_name": "Martin",
+        "total_spent": 84.73,
+        "spending_rank": 151,
+        "spending_percentile": 0.7614213197969543
+      },
+      {
+        "customer_id": 82,
+        "first_name": "John",
+        "last_name": "Brown",
+        "total_spent": 69.5,
+        "spending_rank": 152,
+        "spending_percentile": 0.766497461928934
+      },
+      {
+        "customer_id": 118,
+        "first_name": "Daniel",
+        "last_name": "Miller",
+        "total_spent": 63.49,
+        "spending_rank": 153,
+        "spending_percentile": 0.7715736040609137
+      },
+      {
+        "customer_id": 132,
+        "first_name": "William",
+        "last_name": "Williams",
+        "total_spent": 60.91,
+        "spending_rank": 154,
+        "spending_percentile": 0.7766497461928934
+      },
+      {
+        "customer_id": 74,
+        "first_name": "Elizabeth",
+        "last_name": "Moore",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 150,
+        "first_name": "James",
+        "last_name": "Hernandez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 140,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 139,
+        "first_name": "Lisa",
+        "last_name": "Allen",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 28,
+        "first_name": "Anthony",
+        "last_name": "Moore",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 77,
+        "first_name": "Karen",
+        "last_name": "Lopez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 72,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 26,
+        "first_name": "Sarah",
+        "last_name": "Thomas",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 15,
+        "first_name": "John",
+        "last_name": "Young",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 25,
+        "first_name": "Patricia",
+        "last_name": "Thomas",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 122,
+        "first_name": "Mary",
+        "last_name": "Rodriguez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 58,
+        "first_name": "John",
+        "last_name": "Rodriguez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 161,
+        "first_name": "Mary",
+        "last_name": "Hernandez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 177,
+        "first_name": "Charles",
+        "last_name": "Taylor",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 20,
+        "first_name": "Matthew",
+        "last_name": "Jones",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 1,
+        "first_name": "Sarah",
+        "last_name": "Harris",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 124,
+        "first_name": "Michael",
+        "last_name": "Rodriguez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 65,
+        "first_name": "Karen",
+        "last_name": "Garcia",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 18,
+        "first_name": "Christopher",
+        "last_name": "Young",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 135,
+        "first_name": "Christopher",
+        "last_name": "Taylor",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 22,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 108,
+        "first_name": "Mary",
+        "last_name": "Gonzalez",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 115,
+        "first_name": "Jennifer",
+        "last_name": "Miller",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 180,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 70,
+        "first_name": "Thomas",
+        "last_name": "Davis",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 71,
+        "first_name": "Jennifer",
+        "last_name": "Allen",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 114,
+        "first_name": "John",
+        "last_name": "King",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 2,
+        "first_name": "Christopher",
+        "last_name": "Young",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 199,
+        "first_name": "David",
+        "last_name": "Smith",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 102,
+        "first_name": "Donna",
+        "last_name": "Allen",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 75,
+        "first_name": "James",
+        "last_name": "White",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 128,
+        "first_name": "Jessica",
+        "last_name": "Thomas",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 31,
+        "first_name": "Daniel",
+        "last_name": "Brown",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 36,
+        "first_name": "Patricia",
+        "last_name": "King",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 166,
+        "first_name": "William",
+        "last_name": "Davis",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 99,
+        "first_name": "James",
+        "last_name": "Moore",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 142,
+        "first_name": "Daniel",
+        "last_name": "King",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 41,
+        "first_name": "Linda",
+        "last_name": "Moore",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 152,
+        "first_name": "Mark",
+        "last_name": "Walker",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 134,
+        "first_name": "Karen",
+        "last_name": "Thomas",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 107,
+        "first_name": "Mark",
+        "last_name": "Taylor",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 7,
+        "first_name": "Linda",
+        "last_name": "Martin",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 63,
+        "first_name": "Charles",
+        "last_name": "Martin",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      },
+      {
+        "customer_id": 138,
+        "first_name": "Matthew",
+        "last_name": "Lewis",
+        "total_spent": 0.0,
+        "spending_rank": 155,
+        "spending_percentile": 0.7817258883248731
+      }
+    ],
+    "tags": [
+      "window_function",
+      "rank",
+      "percentile",
+      "subquery"
+    ],
+    "created_at": "2025-12-13T17:21:27.476005"
+  },
+  {
+    "id": "cte_query",
+    "question": "Find customers whose order value is above average using CTE",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "enterprise",
+    "gold_sql": "\n            WITH customer_order_stats AS (\n                SELECT \n                    c.customer_id,\n                    c.first_name,\n                    c.last_name,\n                    COUNT(o.order_id) as order_count,\n                    COALESCE(AVG(o.total_amount), 0) as avg_order_value,\n                    COALESCE(SUM(o.total_amount), 0) as total_spent\n                FROM customers c\n                LEFT JOIN orders o ON c.customer_id = o.customer_id\n                WHERE o.order_status != 'cancelled' OR o.order_id IS NULL\n                GROUP BY c.customer_id, c.first_name, c.last_name\n            ),\n            overall_avg AS (\n                SELECT AVG(avg_order_value) as overall_avg_order_value\n                FROM customer_order_stats\n                WHERE order_count > 0\n            )\n            SELECT \n                cos.customer_id,\n                cos.first_name,\n                cos.last_name,\n                cos.order_count,\n                cos.avg_order_value,\n                cos.total_spent,\n                oa.overall_avg_order_value,\n                (cos.avg_order_value - oa.overall_avg_order_value) as difference_from_avg\n            FROM customer_order_stats cos\n            CROSS JOIN overall_avg oa\n            WHERE cos.order_count > 0\n            AND cos.avg_order_value > oa.overall_avg_order_value\n            ORDER BY cos.avg_order_value DESC\n            ",
+    "expected_result": [
+      {
+        "customer_id": 159,
+        "first_name": "Charles",
+        "last_name": "Walker",
+        "order_count": 1,
+        "avg_order_value": 555.31,
+        "total_spent": 555.31,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 264.373395021645
+      },
+      {
+        "customer_id": 109,
+        "first_name": "Susan",
+        "last_name": "King",
+        "order_count": 1,
+        "avg_order_value": 547.77,
+        "total_spent": 547.77,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 256.833395021645
+      },
+      {
+        "customer_id": 163,
+        "first_name": "James",
+        "last_name": "Gonzalez",
+        "order_count": 2,
+        "avg_order_value": 520.78,
+        "total_spent": 1041.56,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 229.84339502164502
+      },
+      {
+        "customer_id": 130,
+        "first_name": "James",
+        "last_name": "Thomas",
+        "order_count": 2,
+        "avg_order_value": 506.095,
+        "total_spent": 1012.19,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 215.15839502164502
+      },
+      {
+        "customer_id": 183,
+        "first_name": "Donna",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "avg_order_value": 501.38,
+        "total_spent": 501.38,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 210.44339502164502
+      },
+      {
+        "customer_id": 5,
+        "first_name": "Joseph",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "avg_order_value": 479.09,
+        "total_spent": 479.09,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 188.15339502164503
+      },
+      {
+        "customer_id": 195,
+        "first_name": "Mary",
+        "last_name": "Lee",
+        "order_count": 1,
+        "avg_order_value": 478.69,
+        "total_spent": 478.69,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 187.75339502164502
+      },
+      {
+        "customer_id": 167,
+        "first_name": "Matthew",
+        "last_name": "Walker",
+        "order_count": 2,
+        "avg_order_value": 471.2,
+        "total_spent": 942.4,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 180.263395021645
+      },
+      {
+        "customer_id": 35,
+        "first_name": "Donna",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "avg_order_value": 471.01,
+        "total_spent": 471.01,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 180.073395021645
+      },
+      {
+        "customer_id": 86,
+        "first_name": "Daniel",
+        "last_name": "Johnson",
+        "order_count": 1,
+        "avg_order_value": 470.67,
+        "total_spent": 470.67,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 179.733395021645
+      },
+      {
+        "customer_id": 147,
+        "first_name": "Helen",
+        "last_name": "King",
+        "order_count": 2,
+        "avg_order_value": 469.89,
+        "total_spent": 939.78,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 178.953395021645
+      },
+      {
+        "customer_id": 129,
+        "first_name": "John",
+        "last_name": "Walker",
+        "order_count": 2,
+        "avg_order_value": 467.66,
+        "total_spent": 935.32,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 176.72339502164502
+      },
+      {
+        "customer_id": 189,
+        "first_name": "David",
+        "last_name": "Smith",
+        "order_count": 1,
+        "avg_order_value": 466.94,
+        "total_spent": 466.94,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 176.00339502164502
+      },
+      {
+        "customer_id": 59,
+        "first_name": "Betty",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "avg_order_value": 465.75,
+        "total_spent": 465.75,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 174.81339502164502
+      },
+      {
+        "customer_id": 123,
+        "first_name": "John",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "avg_order_value": 463.9,
+        "total_spent": 463.9,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 172.96339502164503
+      },
+      {
+        "customer_id": 60,
+        "first_name": "Barbara",
+        "last_name": "Davis",
+        "order_count": 2,
+        "avg_order_value": 461.11,
+        "total_spent": 922.22,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 170.17339502164504
+      },
+      {
+        "customer_id": 126,
+        "first_name": "Susan",
+        "last_name": "Young",
+        "order_count": 1,
+        "avg_order_value": 461.01,
+        "total_spent": 461.01,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 170.073395021645
+      },
+      {
+        "customer_id": 27,
+        "first_name": "Jennifer",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "avg_order_value": 460.08,
+        "total_spent": 460.08,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 169.14339502164503
+      },
+      {
+        "customer_id": 83,
+        "first_name": "Helen",
+        "last_name": "White",
+        "order_count": 1,
+        "avg_order_value": 454.82,
+        "total_spent": 454.82,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 163.88339502164501
+      },
+      {
+        "customer_id": 32,
+        "first_name": "Susan",
+        "last_name": "Gonzalez",
+        "order_count": 1,
+        "avg_order_value": 451.56,
+        "total_spent": 451.56,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 160.62339502164502
+      },
+      {
+        "customer_id": 178,
+        "first_name": "James",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "avg_order_value": 444.35,
+        "total_spent": 444.35,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 153.41339502164502
+      },
+      {
+        "customer_id": 24,
+        "first_name": "Jennifer",
+        "last_name": "Lewis",
+        "order_count": 2,
+        "avg_order_value": 438.01,
+        "total_spent": 876.02,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 147.073395021645
+      },
+      {
+        "customer_id": 45,
+        "first_name": "Richard",
+        "last_name": "King",
+        "order_count": 1,
+        "avg_order_value": 435.98,
+        "total_spent": 435.98,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 145.043395021645
+      },
+      {
+        "customer_id": 105,
+        "first_name": "Thomas",
+        "last_name": "Allen",
+        "order_count": 1,
+        "avg_order_value": 435.32,
+        "total_spent": 435.32,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 144.38339502164501
+      },
+      {
+        "customer_id": 54,
+        "first_name": "John",
+        "last_name": "Williams",
+        "order_count": 1,
+        "avg_order_value": 426.52,
+        "total_spent": 426.52,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 135.58339502164503
+      },
+      {
+        "customer_id": 188,
+        "first_name": "Patricia",
+        "last_name": "Davis",
+        "order_count": 1,
+        "avg_order_value": 424.94,
+        "total_spent": 424.94,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 134.00339502164502
+      },
+      {
+        "customer_id": 68,
+        "first_name": "Daniel",
+        "last_name": "Robinson",
+        "order_count": 1,
+        "avg_order_value": 411.53,
+        "total_spent": 411.53,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 120.59339502164502
+      },
+      {
+        "customer_id": 136,
+        "first_name": "Nancy",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "avg_order_value": 409.4,
+        "total_spent": 409.4,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 118.46339502164503
+      },
+      {
+        "customer_id": 185,
+        "first_name": "Mary",
+        "last_name": "Taylor",
+        "order_count": 1,
+        "avg_order_value": 408.83,
+        "total_spent": 408.83,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 117.89339502164502
+      },
+      {
+        "customer_id": 85,
+        "first_name": "Barbara",
+        "last_name": "Rodriguez",
+        "order_count": 2,
+        "avg_order_value": 403.07,
+        "total_spent": 806.14,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 112.13339502164501
+      },
+      {
+        "customer_id": 9,
+        "first_name": "Mark",
+        "last_name": "White",
+        "order_count": 1,
+        "avg_order_value": 400.54,
+        "total_spent": 400.54,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 109.60339502164503
+      },
+      {
+        "customer_id": 67,
+        "first_name": "Jessica",
+        "last_name": "Garcia",
+        "order_count": 2,
+        "avg_order_value": 389.875,
+        "total_spent": 779.75,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 98.93839502164502
+      },
+      {
+        "customer_id": 91,
+        "first_name": "Patricia",
+        "last_name": "Gonzalez",
+        "order_count": 3,
+        "avg_order_value": 387.5933333333333,
+        "total_spent": 1162.78,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 96.65672835497836
+      },
+      {
+        "customer_id": 190,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "avg_order_value": 387.205,
+        "total_spent": 774.41,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 96.26839502164502
+      },
+      {
+        "customer_id": 4,
+        "first_name": "Sarah",
+        "last_name": "Moore",
+        "order_count": 1,
+        "avg_order_value": 381.2,
+        "total_spent": 381.2,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 90.26339502164502
+      },
+      {
+        "customer_id": 3,
+        "first_name": "James",
+        "last_name": "Jones",
+        "order_count": 1,
+        "avg_order_value": 381.2,
+        "total_spent": 381.2,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 90.26339502164502
+      },
+      {
+        "customer_id": 144,
+        "first_name": "Matthew",
+        "last_name": "Wilson",
+        "order_count": 1,
+        "avg_order_value": 379.42,
+        "total_spent": 379.42,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 88.48339502164502
+      },
+      {
+        "customer_id": 169,
+        "first_name": "Barbara",
+        "last_name": "Jones",
+        "order_count": 1,
+        "avg_order_value": 379.09,
+        "total_spent": 379.09,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 88.15339502164503
+      },
+      {
+        "customer_id": 172,
+        "first_name": "Mark",
+        "last_name": "King",
+        "order_count": 2,
+        "avg_order_value": 366.38,
+        "total_spent": 732.76,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 75.44339502164502
+      },
+      {
+        "customer_id": 121,
+        "first_name": "Barbara",
+        "last_name": "Martin",
+        "order_count": 3,
+        "avg_order_value": 363.54333333333335,
+        "total_spent": 1090.63,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 72.60672835497836
+      },
+      {
+        "customer_id": 143,
+        "first_name": "David",
+        "last_name": "Lopez",
+        "order_count": 3,
+        "avg_order_value": 359.53333333333336,
+        "total_spent": 1078.6,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 68.59672835497835
+      },
+      {
+        "customer_id": 19,
+        "first_name": "Daniel",
+        "last_name": "Harris",
+        "order_count": 1,
+        "avg_order_value": 349.31,
+        "total_spent": 349.31,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 58.373395021645024
+      },
+      {
+        "customer_id": 127,
+        "first_name": "Donna",
+        "last_name": "Clark",
+        "order_count": 1,
+        "avg_order_value": 348.14,
+        "total_spent": 348.14,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 57.20339502164502
+      },
+      {
+        "customer_id": 40,
+        "first_name": "Donald",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "avg_order_value": 346.755,
+        "total_spent": 693.51,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 55.818395021645024
+      },
+      {
+        "customer_id": 104,
+        "first_name": "Jessica",
+        "last_name": "Anderson",
+        "order_count": 1,
+        "avg_order_value": 344.18,
+        "total_spent": 344.18,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 53.24339502164502
+      },
+      {
+        "customer_id": 187,
+        "first_name": "William",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "avg_order_value": 339.36,
+        "total_spent": 339.36,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 48.42339502164502
+      },
+      {
+        "customer_id": 155,
+        "first_name": "Jessica",
+        "last_name": "Harris",
+        "order_count": 2,
+        "avg_order_value": 336.185,
+        "total_spent": 672.37,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 45.248395021645024
+      },
+      {
+        "customer_id": 197,
+        "first_name": "Nancy",
+        "last_name": "Robinson",
+        "order_count": 2,
+        "avg_order_value": 335.745,
+        "total_spent": 671.49,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 44.80839502164502
+      },
+      {
+        "customer_id": 101,
+        "first_name": "Charles",
+        "last_name": "Harris",
+        "order_count": 1,
+        "avg_order_value": 335.13,
+        "total_spent": 335.13,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 44.193395021645024
+      },
+      {
+        "customer_id": 87,
+        "first_name": "Joseph",
+        "last_name": "Smith",
+        "order_count": 2,
+        "avg_order_value": 334.63,
+        "total_spent": 669.26,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 43.693395021645024
+      },
+      {
+        "customer_id": 96,
+        "first_name": "Jennifer",
+        "last_name": "Rodriguez",
+        "order_count": 2,
+        "avg_order_value": 333.87,
+        "total_spent": 667.74,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 42.93339502164502
+      },
+      {
+        "customer_id": 23,
+        "first_name": "Matthew",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "avg_order_value": 329.48,
+        "total_spent": 329.48,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 38.54339502164502
+      },
+      {
+        "customer_id": 79,
+        "first_name": "Barbara",
+        "last_name": "Taylor",
+        "order_count": 3,
+        "avg_order_value": 328.9866666666667,
+        "total_spent": 986.96,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 38.050061688311686
+      },
+      {
+        "customer_id": 38,
+        "first_name": "Donald",
+        "last_name": "Martin",
+        "order_count": 1,
+        "avg_order_value": 328.49,
+        "total_spent": 328.49,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 37.553395021645024
+      },
+      {
+        "customer_id": 44,
+        "first_name": "Joseph",
+        "last_name": "Walker",
+        "order_count": 2,
+        "avg_order_value": 324.11,
+        "total_spent": 648.22,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 33.17339502164502
+      },
+      {
+        "customer_id": 73,
+        "first_name": "Patricia",
+        "last_name": "Thompson",
+        "order_count": 2,
+        "avg_order_value": 322.815,
+        "total_spent": 645.63,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 31.878395021645023
+      },
+      {
+        "customer_id": 137,
+        "first_name": "Donald",
+        "last_name": "Hernandez",
+        "order_count": 1,
+        "avg_order_value": 322.76,
+        "total_spent": 322.76,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 31.823395021645023
+      },
+      {
+        "customer_id": 14,
+        "first_name": "Jennifer",
+        "last_name": "Brown",
+        "order_count": 3,
+        "avg_order_value": 322.42,
+        "total_spent": 967.26,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 31.483395021645023
+      },
+      {
+        "customer_id": 46,
+        "first_name": "Mark",
+        "last_name": "Jackson",
+        "order_count": 1,
+        "avg_order_value": 314.39,
+        "total_spent": 314.39,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 23.453395021645022
+      },
+      {
+        "customer_id": 198,
+        "first_name": "Matthew",
+        "last_name": "Hernandez",
+        "order_count": 2,
+        "avg_order_value": 311.46,
+        "total_spent": 622.92,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 20.523395021645022
+      },
+      {
+        "customer_id": 184,
+        "first_name": "Christopher",
+        "last_name": "Martinez",
+        "order_count": 1,
+        "avg_order_value": 309.22,
+        "total_spent": 309.22,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 18.28339502164502
+      },
+      {
+        "customer_id": 92,
+        "first_name": "Nancy",
+        "last_name": "Smith",
+        "order_count": 2,
+        "avg_order_value": 307.89,
+        "total_spent": 615.78,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 16.953395021645022
+      },
+      {
+        "customer_id": 179,
+        "first_name": "John",
+        "last_name": "King",
+        "order_count": 5,
+        "avg_order_value": 307.39,
+        "total_spent": 1536.95,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 16.453395021645022
+      },
+      {
+        "customer_id": 12,
+        "first_name": "Helen",
+        "last_name": "Smith",
+        "order_count": 2,
+        "avg_order_value": 304.155,
+        "total_spent": 608.31,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 13.218395021645021
+      },
+      {
+        "customer_id": 148,
+        "first_name": "John",
+        "last_name": "Jones",
+        "order_count": 2,
+        "avg_order_value": 303.52,
+        "total_spent": 607.04,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 12.583395021645021
+      },
+      {
+        "customer_id": 119,
+        "first_name": "Nancy",
+        "last_name": "Taylor",
+        "order_count": 2,
+        "avg_order_value": 302.86,
+        "total_spent": 605.72,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 11.923395021645021
+      },
+      {
+        "customer_id": 11,
+        "first_name": "Michael",
+        "last_name": "Gonzalez",
+        "order_count": 3,
+        "avg_order_value": 302.1166666666667,
+        "total_spent": 906.35,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 11.180061688311689
+      },
+      {
+        "customer_id": 42,
+        "first_name": "James",
+        "last_name": "Moore",
+        "order_count": 2,
+        "avg_order_value": 301.025,
+        "total_spent": 602.05,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 10.088395021645022
+      },
+      {
+        "customer_id": 149,
+        "first_name": "Christopher",
+        "last_name": "Gonzalez",
+        "order_count": 2,
+        "avg_order_value": 300.965,
+        "total_spent": 601.93,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 10.028395021645022
+      },
+      {
+        "customer_id": 34,
+        "first_name": "Christopher",
+        "last_name": "Lopez",
+        "order_count": 2,
+        "avg_order_value": 297.785,
+        "total_spent": 595.57,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 6.848395021645022
+      },
+      {
+        "customer_id": 162,
+        "first_name": "Helen",
+        "last_name": "Brown",
+        "order_count": 4,
+        "avg_order_value": 297.0275,
+        "total_spent": 1188.11,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 6.0908950216450215
+      },
+      {
+        "customer_id": 133,
+        "first_name": "Sandra",
+        "last_name": "Anderson",
+        "order_count": 2,
+        "avg_order_value": 296.64,
+        "total_spent": 593.28,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 5.703395021645021
+      },
+      {
+        "customer_id": 30,
+        "first_name": "Thomas",
+        "last_name": "Jones",
+        "order_count": 2,
+        "avg_order_value": 295.285,
+        "total_spent": 590.57,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 4.348395021645022
+      },
+      {
+        "customer_id": 157,
+        "first_name": "Anthony",
+        "last_name": "Johnson",
+        "order_count": 4,
+        "avg_order_value": 293.26,
+        "total_spent": 1173.04,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 2.3233950216450214
+      },
+      {
+        "customer_id": 6,
+        "first_name": "Thomas",
+        "last_name": "Thomas",
+        "order_count": 2,
+        "avg_order_value": 292.755,
+        "total_spent": 585.51,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 1.8183950216450215
+      },
+      {
+        "customer_id": 53,
+        "first_name": "Charles",
+        "last_name": "Robinson",
+        "order_count": 2,
+        "avg_order_value": 292.38,
+        "total_spent": 584.76,
+        "overall_avg_order_value": 290.936604978355,
+        "difference_from_avg": 1.4433950216450215
+      }
+    ],
+    "tags": [
+      "cte",
+      "window_function",
+      "aggregation"
+    ],
+    "created_at": "2025-12-13T17:21:27.477188"
+  },
+  {
+    "id": "date_analysis",
+    "question": "Show monthly revenue trends for current year",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "medium",
+    "gold_sql": "\n            SELECT \n                DATE_TRUNC('month', order_date) as month,\n                COUNT(order_id) as order_count,\n                SUM(total_amount) as total_revenue,\n                AVG(total_amount) as avg_order_value,\n                COUNT(DISTINCT customer_id) as unique_customers\n            FROM orders\n            WHERE order_status != 'cancelled'\n            AND order_date >= DATE_TRUNC('year', CURRENT_DATE)\n            GROUP BY DATE_TRUNC('month', order_date)\n            ORDER BY month\n            ",
+    "expected_result": [
+      {
+        "month": "2025-01-01T00:00:00",
+        "order_count": 28,
+        "total_revenue": 9017.27,
+        "avg_order_value": 322.04535714285714,
+        "unique_customers": 28
+      },
+      {
+        "month": "2025-02-01T00:00:00",
+        "order_count": 17,
+        "total_revenue": 4991.56,
+        "avg_order_value": 293.62117647058824,
+        "unique_customers": 16
+      },
+      {
+        "month": "2025-03-01T00:00:00",
+        "order_count": 26,
+        "total_revenue": 7772.96,
+        "avg_order_value": 298.96,
+        "unique_customers": 24
+      },
+      {
+        "month": "2025-04-01T00:00:00",
+        "order_count": 24,
+        "total_revenue": 6521.95,
+        "avg_order_value": 271.74791666666664,
+        "unique_customers": 22
+      },
+      {
+        "month": "2025-05-01T00:00:00",
+        "order_count": 25,
+        "total_revenue": 5012.55,
+        "avg_order_value": 200.502,
+        "unique_customers": 24
+      },
+      {
+        "month": "2025-06-01T00:00:00",
+        "order_count": 29,
+        "total_revenue": 8200.02,
+        "avg_order_value": 282.7593103448276,
+        "unique_customers": 26
+      },
+      {
+        "month": "2025-07-01T00:00:00",
+        "order_count": 25,
+        "total_revenue": 5765.81,
+        "avg_order_value": 230.6324,
+        "unique_customers": 24
+      },
+      {
+        "month": "2025-08-01T00:00:00",
+        "order_count": 27,
+        "total_revenue": 9018.78,
+        "avg_order_value": 334.0288888888889,
+        "unique_customers": 26
+      },
+      {
+        "month": "2025-09-01T00:00:00",
+        "order_count": 21,
+        "total_revenue": 6288.59,
+        "avg_order_value": 299.45666666666665,
+        "unique_customers": 20
+      },
+      {
+        "month": "2025-10-01T00:00:00",
+        "order_count": 28,
+        "total_revenue": 7592.59,
+        "avg_order_value": 271.1639285714286,
+        "unique_customers": 28
+      },
+      {
+        "month": "2025-11-01T00:00:00",
+        "order_count": 22,
+        "total_revenue": 5735.61,
+        "avg_order_value": 260.70954545454543,
+        "unique_customers": 21
+      },
+      {
+        "month": "2025-12-01T00:00:00",
+        "order_count": 7,
+        "total_revenue": 2304.97,
+        "avg_order_value": 329.2814285714286,
+        "unique_customers": 6
+      }
+    ],
+    "tags": [
+      "date_functions",
+      "aggregation",
+      "group_by"
+    ],
+    "created_at": "2025-12-13T17:21:27.478520"
+  },
+  {
+    "id": "product_performance",
+    "question": "Analyze product performance with review correlation",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "hard",
+    "gold_sql": "\n            SELECT \n                p.product_id,\n                p.product_name,\n                c.category_name,\n                p.unit_price,\n                p.rating,\n                p.review_count,\n                COALESCE(sales.total_sold, 0) as units_sold,\n                COALESCE(sales.total_revenue, 0) as revenue,\n                CASE \n                    WHEN p.review_count > 0 THEN \n                        CASE WHEN sales.total_sold > 0 THEN sales.total_sold::FLOAT / p.review_count ELSE 0 END\n                    ELSE 0 \n                END as sales_per_review\n            FROM products p\n            JOIN categories c ON p.category_id = c.category_id\n            LEFT JOIN (\n                SELECT \n                    oi.product_id,\n                    SUM(oi.quantity) as total_sold,\n                    SUM(oi.total_price) as total_revenue\n                FROM order_items oi\n                JOIN orders o ON oi.order_id = o.order_id\n                WHERE o.order_status != 'cancelled'\n                GROUP BY oi.product_id\n            ) sales ON p.product_id = sales.product_id\n            WHERE p.is_active = true\n            ORDER BY revenue DESC NULLS LAST\n            LIMIT 20\n            ",
+    "expected_result": [
+      {
+        "product_id": 8,
+        "product_name": "Graphics Card RTX 8",
+        "category_name": "Speakers",
+        "unit_price": 896.64,
+        "rating": 4.6,
+        "review_count": 341,
+        "units_sold": 47,
+        "revenue": 37390.81,
+        "sales_per_review": 0.1378299120234604
+      },
+      {
+        "product_id": 2,
+        "product_name": "CPU Cooler Liquid 2",
+        "category_name": "Computer Components",
+        "unit_price": 979.05,
+        "rating": 4.9,
+        "review_count": 354,
+        "units_sold": 38,
+        "revenue": 33336.06,
+        "sales_per_review": 0.10734463276836158
+      },
+      {
+        "product_id": 97,
+        "product_name": "RAM 16GB DDR4 97",
+        "category_name": "Audio",
+        "unit_price": 897.0,
+        "rating": 4.2,
+        "review_count": 340,
+        "units_sold": 39,
+        "revenue": 31415.66,
+        "sales_per_review": 0.11470588235294117
+      },
+      {
+        "product_id": 87,
+        "product_name": "Monitor 27-inch 4K 87",
+        "category_name": "Electronics",
+        "unit_price": 994.6,
+        "rating": 4.1,
+        "review_count": 34,
+        "units_sold": 34,
+        "revenue": 30528.64,
+        "sales_per_review": 1.0
+      },
+      {
+        "product_id": 17,
+        "product_name": "Case ATX Mid Tower 17",
+        "category_name": "Computer Components",
+        "unit_price": 894.43,
+        "rating": 3.2,
+        "review_count": 207,
+        "units_sold": 37,
+        "revenue": 30430.76,
+        "sales_per_review": 0.178743961352657
+      },
+      {
+        "product_id": 29,
+        "product_name": "4K Webcam Pro 29",
+        "category_name": "Computers",
+        "unit_price": 912.32,
+        "rating": 3.2,
+        "review_count": 359,
+        "units_sold": 33,
+        "revenue": 27849.54,
+        "sales_per_review": 0.09192200557103064
+      },
+      {
+        "product_id": 9,
+        "product_name": "Tablet 10-inch 9",
+        "category_name": "Laptops",
+        "unit_price": 816.34,
+        "rating": 3.5,
+        "review_count": 106,
+        "units_sold": 37,
+        "revenue": 27441.68,
+        "sales_per_review": 0.3490566037735849
+      },
+      {
+        "product_id": 94,
+        "product_name": "RAM 16GB DDR4 94",
+        "category_name": "Audio",
+        "unit_price": 937.31,
+        "rating": 4.8,
+        "review_count": 178,
+        "units_sold": 30,
+        "revenue": 25194.72,
+        "sales_per_review": 0.16853932584269662
+      },
+      {
+        "product_id": 50,
+        "product_name": "Mechanical Keyboard RGB 50",
+        "category_name": "Speakers",
+        "unit_price": 997.81,
+        "rating": 4.6,
+        "review_count": 144,
+        "units_sold": 28,
+        "revenue": 24624.87,
+        "sales_per_review": 0.19444444444444445
+      },
+      {
+        "product_id": 64,
+        "product_name": "Tablet 10-inch 64",
+        "category_name": "Phone Accessories",
+        "unit_price": 740.96,
+        "rating": 3.7,
+        "review_count": 297,
+        "units_sold": 36,
+        "revenue": 24585.74,
+        "sales_per_review": 0.12121212121212122
+      },
+      {
+        "product_id": 68,
+        "product_name": "Tablet 10-inch 68",
+        "category_name": "Computer Components",
+        "unit_price": 835.01,
+        "rating": 4.3,
+        "review_count": 57,
+        "units_sold": 34,
+        "revenue": 24534.69,
+        "sales_per_review": 0.5964912280701754
+      },
+      {
+        "product_id": 95,
+        "product_name": "Wireless Mouse Ergonomic 95",
+        "category_name": "Electronics",
+        "unit_price": 922.49,
+        "rating": 4.2,
+        "review_count": 31,
+        "units_sold": 29,
+        "revenue": 23513.76,
+        "sales_per_review": 0.9354838709677419
+      },
+      {
+        "product_id": 26,
+        "product_name": "Desk Lamp LED 26",
+        "category_name": "Headphones",
+        "unit_price": 906.38,
+        "rating": 3.9,
+        "review_count": 341,
+        "units_sold": 29,
+        "revenue": 23387.72,
+        "sales_per_review": 0.08504398826979472
+      },
+      {
+        "product_id": 91,
+        "product_name": "Monitor 27-inch 4K 91",
+        "category_name": "Computer Components",
+        "unit_price": 833.53,
+        "rating": 3.9,
+        "review_count": 203,
+        "units_sold": 29,
+        "revenue": 22601.75,
+        "sales_per_review": 0.14285714285714285
+      },
+      {
+        "product_id": 59,
+        "product_name": "Cable Management Kit 59",
+        "category_name": "Laptops",
+        "unit_price": 699.04,
+        "rating": 3.3,
+        "review_count": 484,
+        "units_sold": 36,
+        "revenue": 22170.61,
+        "sales_per_review": 0.0743801652892562
+      },
+      {
+        "product_id": 72,
+        "product_name": "External SSD 1TB 72",
+        "category_name": "Audio",
+        "unit_price": 681.64,
+        "rating": 4.3,
+        "review_count": 302,
+        "units_sold": 35,
+        "revenue": 21741.13,
+        "sales_per_review": 0.11589403973509933
+      },
+      {
+        "product_id": 78,
+        "product_name": "USB-C Hub 7-in-1 78",
+        "category_name": "Audio",
+        "unit_price": 892.59,
+        "rating": 4.3,
+        "review_count": 90,
+        "units_sold": 27,
+        "revenue": 20944.44,
+        "sales_per_review": 0.3
+      },
+      {
+        "product_id": 96,
+        "product_name": "Smart Watch Series 5 96",
+        "category_name": "Mobile",
+        "unit_price": 990.99,
+        "rating": 4.5,
+        "review_count": 229,
+        "units_sold": 22,
+        "revenue": 20011.36,
+        "sales_per_review": 0.09606986899563319
+      },
+      {
+        "product_id": 19,
+        "product_name": "Laptop Stand Adjustable 19",
+        "category_name": "Peripherals",
+        "unit_price": 711.79,
+        "rating": 3.6,
+        "review_count": 307,
+        "units_sold": 30,
+        "revenue": 19918.96,
+        "sales_per_review": 0.09771986970684039
+      },
+      {
+        "product_id": 10,
+        "product_name": "Smart Watch Series 5 10",
+        "category_name": "Accessories",
+        "unit_price": 914.43,
+        "rating": 3.1,
+        "review_count": 65,
+        "units_sold": 24,
+        "revenue": 19774.48,
+        "sales_per_review": 0.36923076923076925
+      }
+    ],
+    "tags": [
+      "join",
+      "subquery",
+      "case_statement",
+      "aggregation"
+    ],
+    "created_at": "2025-12-13T17:21:27.480069"
+  },
+  {
+    "id": "customer_segmentation",
+    "question": "Analyze customer segments with their actual spending patterns",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "hard",
+    "gold_sql": "\n            SELECT \n                cs.segment_name,\n                COUNT(c.customer_id) as customer_count,\n                COALESCE(AVG(order_stats.avg_order_value), 0) as avg_order_value,\n                COALESCE(SUM(order_stats.total_spent), 0) as segment_revenue,\n                COALESCE(AVG(order_stats.order_count), 0) as avg_orders_per_customer,\n                cs.min_total_spent as expected_min_spent,\n                cs.max_total_spent as expected_max_spent\n            FROM customer_segments cs\n            LEFT JOIN customers c ON cs.segment_id = c.customer_segment_id\n            LEFT JOIN (\n                SELECT \n                    c.customer_id,\n                    c.customer_segment_id,\n                    COUNT(o.order_id) as order_count,\n                    COALESCE(AVG(o.total_amount), 0) as avg_order_value,\n                    COALESCE(SUM(o.total_amount), 0) as total_spent\n                FROM customers c\n                LEFT JOIN orders o ON c.customer_id = o.customer_id\n                WHERE o.order_status != 'cancelled' OR o.order_id IS NULL\n                GROUP BY c.customer_id, c.customer_segment_id\n            ) order_stats ON c.customer_id = order_stats.customer_id\n            GROUP BY cs.segment_id, cs.segment_name, cs.min_total_spent, cs.max_total_spent\n            ORDER BY segment_revenue DESC\n            ",
+    "expected_result": [
+      {
+        "segment_name": "Bronze",
+        "customer_count": 53,
+        "avg_order_value": 224.0885220125786,
+        "segment_revenue": 22463.61,
+        "avg_orders_per_customer": 1.5849056603773586,
+        "expected_min_spent": 0.0,
+        "expected_max_spent": 500.0
+      },
+      {
+        "segment_name": "Platinum",
+        "customer_count": 47,
+        "avg_order_value": 246.29132624113475,
+        "segment_revenue": 20695.6,
+        "avg_orders_per_customer": 1.425531914893617,
+        "expected_min_spent": 5000.0,
+        "expected_max_spent": 99999.0
+      },
+      {
+        "segment_name": "Silver",
+        "customer_count": 47,
+        "avg_order_value": 228.97701773049644,
+        "segment_revenue": 19379.92,
+        "avg_orders_per_customer": 1.446808510638298,
+        "expected_min_spent": 500.0,
+        "expected_max_spent": 2000.0
+      },
+      {
+        "segment_name": "Gold",
+        "customer_count": 53,
+        "avg_order_value": 207.64575163398692,
+        "segment_revenue": 18671.6,
+        "avg_orders_per_customer": 1.392156862745098,
+        "expected_min_spent": 2000.0,
+        "expected_max_spent": 5000.0
+      }
+    ],
+    "tags": [
+      "join",
+      "aggregation",
+      "group_by",
+      "customer_analysis"
+    ],
+    "created_at": "2025-12-13T17:21:27.481671"
+  },
+  {
+    "id": "conditional_aggregation",
+    "question": "Show order status breakdown by payment method with conditional totals",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "hard",
+    "gold_sql": "\n            SELECT \n                payment_method,\n                COUNT(*) as total_orders,\n                COUNT(CASE WHEN order_status = 'delivered' THEN 1 END) as delivered_orders,\n                COUNT(CASE WHEN order_status = 'cancelled' THEN 1 END) as cancelled_orders,\n                COUNT(CASE WHEN order_status = 'pending' THEN 1 END) as pending_orders,\n                SUM(CASE WHEN order_status != 'cancelled' THEN total_amount ELSE 0 END) as successful_revenue,\n                SUM(CASE WHEN order_status = 'cancelled' THEN total_amount ELSE 0 END) as cancelled_revenue,\n                AVG(CASE WHEN order_status != 'cancelled' THEN total_amount ELSE NULL END) as avg_successful_order,\n                ROUND(\n                    COUNT(CASE WHEN order_status = 'delivered' THEN 1 END) * 100.0 / \n                    NULLIF(COUNT(*), 0), 2\n                ) as delivery_rate_percent\n            FROM orders\n            GROUP BY payment_method\n            ORDER BY successful_revenue DESC\n            ",
+    "expected_result": [
+      {
+        "payment_method": "credit_card",
+        "total_orders": 70,
+        "delivered_orders": 24,
+        "cancelled_orders": 3,
+        "pending_orders": 5,
+        "successful_revenue": 18073.41,
+        "cancelled_revenue": 951.0,
+        "avg_successful_order": 269.7523880597015,
+        "delivery_rate_percent": 34.29
+      },
+      {
+        "payment_method": "paypal",
+        "total_orders": 61,
+        "delivered_orders": 30,
+        "cancelled_orders": 0,
+        "pending_orders": 6,
+        "successful_revenue": 17144.17,
+        "cancelled_revenue": 0.0,
+        "avg_successful_order": 281.0519672131148,
+        "delivery_rate_percent": 49.18
+      },
+      {
+        "payment_method": "crypto",
+        "total_orders": 59,
+        "delivered_orders": 19,
+        "cancelled_orders": 3,
+        "pending_orders": 8,
+        "successful_revenue": 16777.66,
+        "cancelled_revenue": 527.73,
+        "avg_successful_order": 299.6010714285714,
+        "delivery_rate_percent": 32.2
+      },
+      {
+        "payment_method": "bank_transfer",
+        "total_orders": 56,
+        "delivered_orders": 19,
+        "cancelled_orders": 1,
+        "pending_orders": 5,
+        "successful_revenue": 15170.03,
+        "cancelled_revenue": 362.83,
+        "avg_successful_order": 275.81872727272724,
+        "delivery_rate_percent": 33.93
+      },
+      {
+        "payment_method": "debit_card",
+        "total_orders": 54,
+        "delivered_orders": 18,
+        "cancelled_orders": 3,
+        "pending_orders": 8,
+        "successful_revenue": 14045.46,
+        "cancelled_revenue": 1020.65,
+        "avg_successful_order": 275.4011764705882,
+        "delivery_rate_percent": 33.33
+      }
+    ],
+    "tags": [
+      "conditional_aggregation",
+      "case_statement",
+      "group_by"
+    ],
+    "created_at": "2025-12-13T17:21:27.482393"
+  },
+  {
+    "id": "supplier_performance",
+    "question": "Rank suppliers by product performance and customer satisfaction",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "enterprise",
+    "gold_sql": "\n            SELECT \n                s.supplier_id,\n                s.supplier_name,\n                s.country,\n                s.rating as supplier_rating,\n                COUNT(DISTINCT p.product_id) as product_count,\n                COALESCE(AVG(p.rating), 0) as avg_product_rating,\n                COALESCE(SUM(sales.total_revenue), 0) as total_revenue,\n                COALESCE(SUM(sales.units_sold), 0) as total_units_sold,\n                RANK() OVER (ORDER BY COALESCE(SUM(sales.total_revenue), 0) DESC) as revenue_rank\n            FROM suppliers s\n            LEFT JOIN products p ON s.supplier_id = p.supplier_id\n            LEFT JOIN (\n                SELECT \n                    oi.product_id,\n                    SUM(oi.quantity) as units_sold,\n                    SUM(oi.total_price) as total_revenue\n                FROM order_items oi\n                JOIN orders o ON oi.order_id = o.order_id\n                WHERE o.order_status != 'cancelled'\n                GROUP BY oi.product_id\n            ) sales ON p.product_id = sales.product_id\n            GROUP BY s.supplier_id, s.supplier_name, s.country, s.rating\n            ORDER BY total_revenue DESC NULLS LAST\n            ",
+    "expected_result": [
+      {
+        "supplier_id": 2,
+        "supplier_name": "Global Components Inc",
+        "country": "China",
+        "supplier_rating": 4.2,
+        "product_count": 26,
+        "avg_product_rating": 3.9615384615384617,
+        "total_revenue": 316804.13,
+        "total_units_sold": 638.0,
+        "revenue_rank": 1
+      },
+      {
+        "supplier_id": 3,
+        "supplier_name": "EuroTech Solutions",
+        "country": "Germany",
+        "supplier_rating": 4.7,
+        "product_count": 25,
+        "avg_product_rating": 4.188,
+        "total_revenue": 277407.97,
+        "total_units_sold": 666.0,
+        "revenue_rank": 2
+      },
+      {
+        "supplier_id": 1,
+        "supplier_name": "TechSupply Pro",
+        "country": "USA",
+        "supplier_rating": 4.5,
+        "product_count": 21,
+        "avg_product_rating": 4.019047619047619,
+        "total_revenue": 259216.32,
+        "total_units_sold": 470.0,
+        "revenue_rank": 3
+      },
+      {
+        "supplier_id": 5,
+        "supplier_name": "LocalParts Co",
+        "country": "USA",
+        "supplier_rating": 4.8,
+        "product_count": 13,
+        "avg_product_rating": 3.9076923076923076,
+        "total_revenue": 189733.08,
+        "total_units_sold": 310.0,
+        "revenue_rank": 4
+      },
+      {
+        "supplier_id": 4,
+        "supplier_name": "AsiaDirect Trading",
+        "country": "Japan",
+        "supplier_rating": 4.3,
+        "product_count": 15,
+        "avg_product_rating": 3.7133333333333334,
+        "total_revenue": 163416.77,
+        "total_units_sold": 379.0,
+        "revenue_rank": 5
+      }
+    ],
+    "tags": [
+      "join",
+      "window_function",
+      "aggregation",
+      "ranking"
+    ],
+    "created_at": "2025-12-13T17:21:27.483220"
+  },
+  {
+    "id": "cohort_analysis",
+    "question": "Customer cohort analysis by registration month",
+    "database": "testdb",
+    "dialect": "postgresql",
+    "difficulty": "enterprise",
+    "gold_sql": "\n            WITH customer_cohorts AS (\n                SELECT \n                    customer_id,\n                    DATE_TRUNC('month', registration_date) as cohort_month\n                FROM customers\n            ),\n            cohort_orders AS (\n                SELECT \n                    cc.cohort_month,\n                    o.customer_id,\n                    DATE_TRUNC('month', o.order_date) as order_month,\n                    o.order_id,\n                    o.total_amount\n                FROM customer_cohorts cc\n                JOIN orders o ON cc.customer_id = o.customer_id\n                WHERE o.order_status != 'cancelled'\n            ),\n            cohort_summary AS (\n                SELECT \n                    cohort_month,\n                    COUNT(DISTINCT customer_id) as cohort_size,\n                    COUNT(DISTINCT order_id) as total_orders,\n                    SUM(total_amount) as total_revenue,\n                    AVG(total_amount) as avg_order_value\n                FROM cohort_orders\n                GROUP BY cohort_month\n            )\n            SELECT \n                cohort_month,\n                cohort_size,\n                total_orders,\n                ROUND(total_orders::FLOAT / NULLIF(cohort_size, 0), 2) as orders_per_customer,\n                total_revenue,\n                avg_order_value,\n                ROUND(total_revenue::FLOAT / NULLIF(cohort_size, 0), 2) as revenue_per_customer\n            FROM cohort_summary\n            ORDER BY cohort_month\n            ",
+    "expected_result": [
+      {
+        "error": "function round(double precision, integer) does not exist\nLINE 33:                 ROUND(total_orders::FLOAT / NULLIF(cohort_si...\n                         ^\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\n"
+      }
+    ],
+    "tags": [
+      "cte",
+      "cohort_analysis",
+      "date_functions",
+      "aggregation"
+    ],
+    "created_at": "2025-12-13T17:21:27.483752"
+  }
+]

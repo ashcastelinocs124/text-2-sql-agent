@@ -1,15 +1,14 @@
-"""Infrastructure module for PostgreSQL data layer.
-
-This module provides zero-ORM database connectivity using psycopg3,
-schema introspection via pg_catalog, and bulk loading via COPY protocol.
+"""
+Infrastructure layer for database connections and schema introspection.
 """
 
-from agentx.infrastructure.database_manager import DatabaseManager
-from agentx.infrastructure.fixture_loader import FixtureLoader
-from agentx.infrastructure.schema_inspector import SchemaInspector
+from .models import ColumnInfo, TableInfo, SchemaSnapshot
+from .database import DatabaseAdapter, create_adapter
 
 __all__ = [
-    "DatabaseManager",
-    "SchemaInspector",
-    "FixtureLoader",
+    "ColumnInfo",
+    "TableInfo",
+    "SchemaSnapshot",
+    "DatabaseAdapter",
+    "create_adapter",
 ]

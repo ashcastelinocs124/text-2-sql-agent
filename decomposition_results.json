@@ -1,0 +1,26 @@
+[
+  {
+    "query_id": "complex_multi_join",
+    "original_score": 0.8,
+    "original_time": 0,
+    "decomposed_score": 0.6,
+    "decomposed_time": 0,
+    "subquery_count": 3
+  },
+  {
+    "query_id": "subquery_exists",
+    "original_score": 0.9435,
+    "original_time": 0,
+    "decomposed_score": 0.6,
+    "decomposed_time": 0,
+    "subquery_count": 3
+  },
+  {
+    "query_id": "window_function",
+    "original_score": 0.764,
+    "original_time": 0,
+    "decomposed_score": 0.59975,
+    "decomposed_time": 0,
+    "subquery_count": 2
+  }
+]

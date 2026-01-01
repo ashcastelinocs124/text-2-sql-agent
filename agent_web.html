@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Agent - Interactive Query Validator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .query-input-section {
+            margin-bottom: 2rem;
+        }
+
+        .query-input-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        #sqlQuery {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        #sqlQuery:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .examples {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .examples h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-query {
+            display: inline-block;
+            margin: 0.3rem;
+            padding: 0.4rem 0.8rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-query:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-item value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 0.8rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .insights-list {
+            list-style: none;
+        }
+
+        .insights-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .insights-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 SQL Agent</h1>
+            <p>Validate → Execute → Analyze → Summarize</p>
+        </div>
+
+        <div class="main-card">
+            <div class="card-header">
+                Query Validator & Executor
+            </div>
+            <div class="card-body">
+                <div class="query-input-section">
+                    <label for="sqlQuery">Enter SQL Query:</label>
+                    <textarea id="sqlQuery" placeholder="SELECT * FROM users WHERE age > 30"></textarea>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="executeBtn">
+                            <span>🚀</span> Execute Query
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn">
+                            Clear
+                        </button>
+                    </div>
+
+                    <div class="examples">
+                        <h3>Quick Examples:</h3>
+                        <span class="example-query" data-query="SELECT name, email FROM users WHERE age > 30">Simple SELECT</span>
+                        <span class="example-query" data-query="SELECT u.name, COUNT(o.id) as order_count FROM users u LEFT JOIN orders o ON u.id = o.user_id GROUP BY u.name">JOIN with COUNT</span>
+                        <span class="example-query" data-query="SELECT category, AVG(price) as avg_price FROM products GROUP BY category">Aggregation</span>
+                        <span class="example-query" data-query="SELECT invalid_column FROM users">❌ Invalid Column</span>
+                        <span class="example-query" data-query="DELETE FROM users WHERE id = 1">❌ Unsafe Query</span>
+                    </div>
+                </div>
+
+                <div class="results-section" id="resultsSection">
+                    <!-- Results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sqlQuery = document.getElementById('sqlQuery');
+        const executeBtn = document.getElementById('executeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const exampleQueries = document.querySelectorAll('.example-query');
+
+        // Example query click handlers
+        exampleQueries.forEach(example => {
+            example.addEventListener('click', () => {
+                sqlQuery.value = example.dataset.query;
+                sqlQuery.focus();
+            });
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            sqlQuery.value = '';
+            resultsSection.classList.remove('show');
+            resultsSection.innerHTML = '';
+        });
+
+        // Execute button
+        executeBtn.addEventListener('click', async () => {
+            const query = sqlQuery.value.trim();
+            
+            if (!query) {
+                alert('Please enter a SQL query');
+                return;
+            }
+
+            // Show loading
+            resultsSection.innerHTML = '<div class="loading"><div class="spinner"></div><p>Processing query...</p></div>';
+            resultsSection.classList.add('show');
+            executeBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                resultsSection.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${error.message}
+                        <br><br>
+                        <em>Make sure the backend server is running: python3 agent_server.py</em>
+                    </div>
+                `;
+            } finally {
+                executeBtn.disabled = false;
+            }
+        });
+
+        function displayResults(result) {
+            const isSuccess = result.overall_status === 'SUCCESS';
+            
+            let html = `
+                <div class="status-badge ${isSuccess ? 'status-success' : 'status-error'}">
+                    ${isSuccess ? '✅ SUCCESS' : '❌ FAILED'}
+                </div>
+            `;
+
+            // Validation Results
+            html += `
+                <div class="result-card">
+                    <h3>🔍 Validation</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Status</label>
+                            <value>${result.validation.is_valid ? '✅ Valid' : '❌ Invalid'}</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Query Type</label>
+                            <value>${result.validation.query_type || 'N/A'}</value>
+                        </div>
+                        <div class="info-item">
+                            <label>Tables</label>
+                            <value>${result.validation.tables_accessed.join(', ') || 'None'}</value>
+                        </div>
+                    </div>
+            `;
+
+            if (result.validation.errors.length > 0) {
+                html += '<div class="error-message">';
+                result.validation.errors.forEach(error => {
+                    html += `<div>${error}</div>`;
+                });
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            // Execution Results (if successful)
+            if (isSuccess && result.execution.success) {
+                html += `
+                    <div class="result-card">
+                        <h3>⚙️ Execution</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Rows Returned</label>
+                                <value>${result.execution.rows_returned}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Execution Time</label>
+                                <value>${result.execution.execution_time_ms.toFixed(2)}ms</value>
+                            </div>
+                            <div class="info-item">
+                                <label>Columns</label>
+                                <value>${result.execution.columns.length}</value>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Analysis
+                if (result.analysis.insights.length > 0) {
+                    html += `
+                        <div class="result-card">
+                            <h3>📊 Insights</h3>
+                            <ul class="insights-list">
+                    `;
+                    result.analysis.insights.forEach(insight => {
+                        html += `<li>${insight}</li>`;
+                    });
+                    html += '</ul></div>';
+                }
+
+                // Data Preview
+                if (result.analysis.data_preview.length > 0) {
+                    html += `
+                        <div class="result-card">
+                            <h3>📄 Data Preview</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                    `;
+                    
+                    Object.keys(result.analysis.data_preview[0]).forEach(col => {
+                        html += `<th>${col}</th>`;
+                    });
+                    
+                    html += '</tr></thead><tbody>';
+                    
+                    result.analysis.data_preview.forEach(row => {
+                        html += '<tr>';
+                        Object.values(row).forEach(val => {
+                            html += `<td>${val !== null ? val : '<em>NULL</em>'}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+            }
+
+            resultsSection.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

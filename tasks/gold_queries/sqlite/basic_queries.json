@@ -1,0 +1,122 @@
+[
+  {
+    "id": "sqlite_simple_select",
+    "question": "Get all records from a simple table",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT * FROM customers LIMIT 10",
+    "tags": ["select", "basic"]
+  },
+  {
+    "id": "sqlite_count",
+    "question": "Count total number of records",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT COUNT(*) as total FROM customers",
+    "tags": ["aggregation", "count"]
+  },
+  {
+    "id": "sqlite_where_filter",
+    "question": "Filter records by a condition",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT * FROM customers WHERE city = 'New York'",
+    "tags": ["where", "filter"]
+  },
+  {
+    "id": "sqlite_join",
+    "question": "Join two tables",
+    "dialect": "sqlite",
+    "difficulty": "medium",
+    "gold_sql": "SELECT c.name, o.order_date, o.total FROM customers c JOIN orders o ON c.id = o.customer_id",
+    "tags": ["join", "inner_join"]
+  },
+  {
+    "id": "sqlite_group_by",
+    "question": "Group records and aggregate",
+    "dialect": "sqlite",
+    "difficulty": "medium",
+    "gold_sql": "SELECT city, COUNT(*) as customer_count FROM customers GROUP BY city ORDER BY customer_count DESC",
+    "tags": ["aggregation", "group_by"]
+  },
+  {
+    "id": "sqlite_subquery",
+    "question": "Use a subquery to filter results",
+    "dialect": "sqlite",
+    "difficulty": "medium",
+    "gold_sql": "SELECT * FROM customers WHERE id IN (SELECT customer_id FROM orders WHERE total > 100)",
+    "tags": ["subquery", "in"]
+  },
+  {
+    "id": "sqlite_date_filter",
+    "question": "Filter records by date",
+    "dialect": "sqlite",
+    "difficulty": "medium",
+    "gold_sql": "SELECT * FROM orders WHERE order_date >= date('now', '-30 days')",
+    "tags": ["date", "filter"]
+  },
+  {
+    "id": "sqlite_window_rank",
+    "question": "Rank customers by total spending",
+    "dialect": "sqlite",
+    "difficulty": "hard",
+    "gold_sql": "SELECT customer_id, total_spent, ROW_NUMBER() OVER (ORDER BY total_spent DESC) as rank FROM (SELECT customer_id, SUM(total) as total_spent FROM orders GROUP BY customer_id)",
+    "tags": ["window", "rank", "aggregation"]
+  },
+  {
+    "id": "sqlite_cte",
+    "question": "Use a CTE for complex query",
+    "dialect": "sqlite",
+    "difficulty": "hard",
+    "gold_sql": "WITH customer_totals AS (SELECT customer_id, SUM(total) as total_spent FROM orders GROUP BY customer_id) SELECT c.name, ct.total_spent FROM customers c JOIN customer_totals ct ON c.id = ct.customer_id ORDER BY ct.total_spent DESC LIMIT 10",
+    "tags": ["cte", "with", "aggregation"]
+  },
+  {
+    "id": "sqlite_case_when",
+    "question": "Categorize data using CASE WHEN",
+    "dialect": "sqlite",
+    "difficulty": "medium",
+    "gold_sql": "SELECT name, total, CASE WHEN total > 1000 THEN 'high' WHEN total > 100 THEN 'medium' ELSE 'low' END as category FROM orders",
+    "tags": ["case", "conditional"]
+  },
+  {
+    "id": "sqlite_string_functions",
+    "question": "Use string functions",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT UPPER(name) as upper_name, LENGTH(name) as name_length FROM customers",
+    "tags": ["string", "functions"]
+  },
+  {
+    "id": "sqlite_null_handling",
+    "question": "Handle NULL values",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT name, COALESCE(phone, 'N/A') as phone FROM customers",
+    "tags": ["null", "coalesce"]
+  },
+  {
+    "id": "sqlite_like_pattern",
+    "question": "Search with LIKE pattern",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT * FROM customers WHERE name LIKE 'J%'",
+    "tags": ["like", "pattern", "filter"]
+  },
+  {
+    "id": "sqlite_order_limit",
+    "question": "Order and limit results",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT * FROM customers ORDER BY created_at DESC LIMIT 5",
+    "tags": ["order", "limit", "sort"]
+  },
+  {
+    "id": "sqlite_distinct",
+    "question": "Get distinct values",
+    "dialect": "sqlite",
+    "difficulty": "easy",
+    "gold_sql": "SELECT DISTINCT city FROM customers ORDER BY city",
+    "tags": ["distinct", "unique"]
+  }
+]
