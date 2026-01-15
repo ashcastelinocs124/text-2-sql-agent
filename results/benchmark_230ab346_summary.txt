@@ -1,0 +1,63 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: 230ab346
+Started: 2026-01-02T20:09:31.008744+00:00
+Duration: 0.08 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  27
+Successful:   19
+Failed:       8
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  95.26%
+Median:   96.00%
+Min:      77.10%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 88.90%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 94.45%
+  best_practices      : 93.95%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  easy        : 92.65% (n=10)
+  medium      : 97.31% (n=6)
+  hard        : 99.83% (n=3)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  having              : 100.00% (n=1)
+  correlated_subquery : 100.00% (n=1)
+  group_by            : 100.00% (n=1)
+  running_total       : 99.75% (n=1)
+  case                : 99.75% (n=1)
+  conditional         : 99.75% (n=1)
+  sum                 : 99.75% (n=1)
+  inner_join          : 99.75% (n=1)
+  window              : 99.75% (n=1)
+  self_join           : 99.75% (n=1)
+
+FAILED/ERROR TASKS
+----------------------------------------
+  sqlite_group_by: failed - validation failed
+  sqlite_window_rank: failed - validation failed
+  sqlite_cte: failed - validation failed
+  sqlite_multiple_ctes: failed - validation failed
+  sqlite_enterprise_cohort: failed - validation failed
+  sqlite_enterprise_rfm: failed - validation failed
+  sqlite_enterprise_percentile: failed - validation failed
+  sqlite_enterprise_yoy: failed - validation failed
+
+============================================================

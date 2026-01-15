@@ -1,0 +1,730 @@
+{
+  "benchmark_id": "bedcb09c",
+  "started_at": "2026-01-01T22:41:32.776344",
+  "completed_at": "2026-01-01T22:41:32.836234",
+  "duration_seconds": 0.05989,
+  "config": {
+    "agent_url": null,
+    "tasks_path": null,
+    "output_dir": "results/",
+    "difficulties": [
+      "easy",
+      "medium"
+    ],
+    "tags": null,
+    "formats": [
+      "json",
+      "csv",
+      "summary"
+    ],
+    "dialect": "sqlite",
+    "timeout": 30.0,
+    "verbose": false
+  },
+  "total_tasks": 17,
+  "successful": 16,
+  "failed": 1,
+  "errors": 0,
+  "skipped": 0,
+  "average_score": 0.9440077367424242,
+  "median_score": 0.9600000000000001,
+  "min_score": 0.771,
+  "max_score": 1.0,
+  "scores_by_dimension": {
+    "correctness": 0.86823125,
+    "efficiency": 1.0,
+    "safety": 1.0,
+    "completeness": 1.0,
+    "semantic_accuracy": 0.9340804924242424,
+    "best_practices": 0.934375,
+    "plan_quality": 1.0
+  },
+  "scores_by_difficulty": {
+    "easy": {
+      "count": 10,
+      "average": 0.9265362121212121,
+      "min": 0.771,
+      "max": 0.9974999999999999
+    },
+    "medium": {
+      "count": 6,
+      "average": 0.9731269444444445,
+      "min": 0.9237616666666667,
+      "max": 1.0
+    }
+  },
+  "scores_by_tag": {
+    "subquery": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "avg": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "in": {
+      "count": 2,
+      "average": 0.9600000000000001
+    },
+    "functions": {
+      "count": 1,
+      "average": 0.9220454545454545
+    },
+    "inner_join": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "coalesce": {
+      "count": 1,
+      "average": 0.9174999999999999
+    },
+    "having": {
+      "count": 1,
+      "average": 1.0
+    },
+    "aggregation": {
+      "count": 4,
+      "average": 0.9415
+    },
+    "between": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "and": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "case": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "order": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "basic": {
+      "count": 1,
+      "average": 0.8760666666666667
+    },
+    "like": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "string": {
+      "count": 1,
+      "average": 0.9220454545454545
+    },
+    "join": {
+      "count": 2,
+      "average": 0.9606308333333333
+    },
+    "distinct": {
+      "count": 1,
+      "average": 0.9062500000000001
+    },
+    "unique": {
+      "count": 1,
+      "average": 0.9062500000000001
+    },
+    "select": {
+      "count": 1,
+      "average": 0.8760666666666667
+    },
+    "sort": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "filter": {
+      "count": 2,
+      "average": 0.9600000000000001
+    },
+    "sum": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "left_join": {
+      "count": 1,
+      "average": 0.9237616666666667
+    },
+    "or": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "count": {
+      "count": 1,
+      "average": 0.771
+    },
+    "null": {
+      "count": 1,
+      "average": 0.9174999999999999
+    },
+    "limit": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "where": {
+      "count": 2,
+      "average": 0.9600000000000001
+    },
+    "group_by": {
+      "count": 1,
+      "average": 1.0
+    },
+    "conditional": {
+      "count": 1,
+      "average": 0.9974999999999999
+    }
+  },
+  "results": [
+    {
+      "task_id": "sqlite_simple_select",
+      "question": "Get all customer records with a limit of 10",
+      "difficulty": "easy",
+      "tags": [
+        "select",
+        "basic"
+      ],
+      "gold_sql": "SELECT * FROM customers LIMIT 10",
+      "agent_sql": "SELECT * FROM customers LIMIT 10",
+      "status": "success",
+      "overall_score": 0.8760666666666667,
+      "correctness": 0.7,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.8606666666666667,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.02288818359375,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.7,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_count",
+      "question": "Count the total number of customers in the database",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "count"
+      ],
+      "gold_sql": "SELECT COUNT(*) as total FROM customers",
+      "agent_sql": "SELECT COUNT(*) as total FROM customers",
+      "status": "success",
+      "overall_score": 0.771,
+      "correctness": 0.5,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.4600000000000001,
+      "best_practices": 1.0,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.010013580322265625,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.5,
+      "error_message": null,
+      "suggestions": []
+    },
+    {
+      "task_id": "sqlite_where_filter",
+      "question": "Find all customers who live in New York",
+      "difficulty": "easy",
+      "tags": [
+        "where",
+        "filter"
+      ],
+      "gold_sql": "SELECT * FROM customers WHERE city = 'New York'",
+      "agent_sql": "SELECT * FROM customers WHERE city = 'New York'",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.014066696166992188,
+      "rows_returned": 2,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_join",
+      "question": "Get customer names along with their order dates and totals",
+      "difficulty": "medium",
+      "tags": [
+        "join",
+        "inner_join"
+      ],
+      "gold_sql": "SELECT c.name, o.order_date, o.total FROM customers c JOIN orders o ON c.id = o.customer_id",
+      "agent_sql": "SELECT c.name, o.order_date, o.total FROM customers c JOIN orders o ON c.id = o.customer_id",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.019788742065429688,
+      "rows_returned": 5,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause",
+        "Use table aliases for joined tables"
+      ]
+    },
+    {
+      "task_id": "sqlite_group_by",
+      "question": "Count the number of customers in each city, ordered by count descending",
+      "difficulty": "medium",
+      "tags": [
+        "aggregation",
+        "group_by"
+      ],
+      "gold_sql": "SELECT city, COUNT(*) as customer_count FROM customers GROUP BY city ORDER BY customer_count DESC",
+      "agent_sql": "SELECT city, COUNT(*) as customer_count FROM customers GROUP BY city ORDER BY customer_count DESC",
+      "status": "failed",
+      "overall_score": 0.0,
+      "correctness": 0.0,
+      "efficiency": 0.0,
+      "safety": 0.0,
+      "completeness": 0.0,
+      "semantic_accuracy": 0.0,
+      "best_practices": 0.0,
+      "plan_quality": 0.0,
+      "execution_time_ms": 0.0,
+      "rows_returned": 0,
+      "is_valid": false,
+      "validation_errors": [
+        "Column 'customer_count' does not exist"
+      ],
+      "phantom_tables": [],
+      "phantom_columns": [
+        "customer_count"
+      ],
+      "matches_expected": null,
+      "match_score": 0.0,
+      "error_message": null,
+      "suggestions": []
+    },
+    {
+      "task_id": "sqlite_subquery",
+      "question": "Find customers who have placed orders with a total greater than 100",
+      "difficulty": "medium",
+      "tags": [
+        "subquery",
+        "in"
+      ],
+      "gold_sql": "SELECT * FROM customers WHERE id IN (SELECT customer_id FROM orders WHERE total > 100)",
+      "agent_sql": "SELECT * FROM customers WHERE id IN (SELECT customer_id FROM orders WHERE total > 100)",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.029087066650390625,
+      "rows_returned": 3,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_left_join",
+      "question": "Get all customers and their orders (including customers with no orders)",
+      "difficulty": "medium",
+      "tags": [
+        "join",
+        "left_join"
+      ],
+      "gold_sql": "SELECT c.name, o.total FROM customers c LEFT JOIN orders o ON c.id = o.customer_id",
+      "agent_sql": "SELECT c.name, o.total FROM customers c LEFT JOIN orders o ON c.id = o.customer_id",
+      "status": "success",
+      "overall_score": 0.9237616666666667,
+      "correctness": 0.8167,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.9041666666666667,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.024080276489257812,
+      "rows_returned": 5,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.8167,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause",
+        "Use table aliases for joined tables"
+      ]
+    },
+    {
+      "task_id": "sqlite_aggregate_sum",
+      "question": "Calculate the total revenue from all orders",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "sum"
+      ],
+      "gold_sql": "SELECT SUM(total) as total_revenue FROM orders",
+      "agent_sql": "SELECT SUM(total) as total_revenue FROM orders",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.013113021850585938,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_aggregate_avg",
+      "question": "Calculate the average order value",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "avg"
+      ],
+      "gold_sql": "SELECT AVG(total) as avg_order_value FROM orders",
+      "agent_sql": "SELECT AVG(total) as avg_order_value FROM orders",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.007152557373046875,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_case_when",
+      "question": "Categorize orders as 'high', 'medium', or 'low' based on total amount",
+      "difficulty": "medium",
+      "tags": [
+        "case",
+        "conditional"
+      ],
+      "gold_sql": "SELECT id, total, CASE WHEN total > 500 THEN 'high' WHEN total > 100 THEN 'medium' ELSE 'low' END as category FROM orders",
+      "agent_sql": "SELECT id, total, CASE WHEN total > 500 THEN 'high' WHEN total > 100 THEN 'medium' ELSE 'low' END as category FROM orders",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.028848648071289062,
+      "rows_returned": 5,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_string_functions",
+      "question": "Get customer names in uppercase along with the length of their names",
+      "difficulty": "easy",
+      "tags": [
+        "string",
+        "functions"
+      ],
+      "gold_sql": "SELECT UPPER(name) as upper_name, LENGTH(name) as name_length FROM customers",
+      "agent_sql": "SELECT UPPER(name) as upper_name, LENGTH(name) as name_length FROM customers",
+      "status": "success",
+      "overall_score": 0.9220454545454545,
+      "correctness": 0.8,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.9454545454545455,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.01811981201171875,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.8,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_null_handling",
+      "question": "Get customer names and phone numbers, showing 'N/A' for missing phone numbers",
+      "difficulty": "easy",
+      "tags": [
+        "null",
+        "coalesce"
+      ],
+      "gold_sql": "SELECT name, COALESCE(phone, 'N/A') as phone FROM customers",
+      "agent_sql": "SELECT name, COALESCE(phone, 'N/A') as phone FROM customers",
+      "status": "success",
+      "overall_score": 0.9174999999999999,
+      "correctness": 0.8,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.9000000000000001,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.015020370483398438,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.8,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_distinct",
+      "question": "Get a list of all unique cities where customers live",
+      "difficulty": "easy",
+      "tags": [
+        "distinct",
+        "unique"
+      ],
+      "gold_sql": "SELECT DISTINCT city FROM customers ORDER BY city",
+      "agent_sql": "SELECT DISTINCT city FROM customers ORDER BY city",
+      "status": "success",
+      "overall_score": 0.9062500000000001,
+      "correctness": 0.775,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.875,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.0247955322265625,
+      "rows_returned": 3,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.775,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_order_limit",
+      "question": "Get the 3 most recent orders based on order date",
+      "difficulty": "easy",
+      "tags": [
+        "order",
+        "limit",
+        "sort"
+      ],
+      "gold_sql": "SELECT * FROM orders ORDER BY order_date DESC LIMIT 3",
+      "agent_sql": "SELECT * FROM orders ORDER BY order_date DESC LIMIT 3",
+      "status": "success",
+      "overall_score": 0.9575,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.85,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.026226043701171875,
+      "rows_returned": 3,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need",
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_between",
+      "question": "Find orders with totals between 50 and 200 (inclusive)",
+      "difficulty": "easy",
+      "tags": [
+        "between",
+        "filter"
+      ],
+      "gold_sql": "SELECT * FROM orders WHERE total BETWEEN 50 AND 200",
+      "agent_sql": "SELECT * FROM orders WHERE total BETWEEN 50 AND 200",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.015020370483398438,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_having",
+      "question": "Find cities with more than 1 customer",
+      "difficulty": "medium",
+      "tags": [
+        "having",
+        "group_by",
+        "aggregation"
+      ],
+      "gold_sql": "SELECT city, COUNT(*) as customer_count FROM customers GROUP BY city HAVING COUNT(*) > 1",
+      "agent_sql": "SELECT city, COUNT(*) as customer_count FROM customers GROUP BY city HAVING COUNT(*) > 1",
+      "status": "success",
+      "overall_score": 1.0,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 1.0,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.02002716064453125,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": []
+    },
+    {
+      "task_id": "sqlite_multiple_conditions",
+      "question": "Find customers in New York or Los Angeles with names starting with 'A' or 'B'",
+      "difficulty": "medium",
+      "tags": [
+        "where",
+        "in",
+        "like",
+        "and",
+        "or"
+      ],
+      "gold_sql": "SELECT * FROM customers WHERE city IN ('New York', 'Los Angeles') AND (name LIKE 'A%' OR name LIKE 'B%')",
+      "agent_sql": "SELECT * FROM customers WHERE city IN ('New York', 'Los Angeles') AND (name LIKE 'A%' OR name LIKE 'B%')",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.0209808349609375,
+      "rows_returned": 2,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    }
+  ]
+}

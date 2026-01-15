@@ -1,0 +1,41 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: 91b8539c
+Started: 2026-01-01T23:01:48.034791+00:00
+Duration: 0.08 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  2
+Successful:   0
+Failed:       2
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  0.00%
+Median:   0.00%
+Min:      0.00%
+Max:      0.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 0.00%
+  efficiency          : 0.00%
+  safety              : 0.00%
+  completeness        : 0.00%
+  semantic_accuracy   : 0.00%
+  best_practices      : 0.00%
+  plan_quality        : 0.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+
+FAILED/ERROR TASKS
+----------------------------------------
+  ent_recursive_hierarchy: failed - validation failed
+  ent_recursive_bom: failed - validation failed
+
+============================================================

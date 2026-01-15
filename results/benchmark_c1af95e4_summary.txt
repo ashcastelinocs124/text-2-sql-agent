@@ -1,0 +1,52 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: c1af95e4
+Started: 2026-01-02T06:04:43.937346+00:00
+Duration: 0.14 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  4
+Successful:   3
+Failed:       1
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  100.00%
+Median:   100.00%
+Min:      100.00%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 100.00%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 100.00%
+  best_practices      : 100.00%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  enterprise  : 100.00% (n=3)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  point_in_time       : 100.00% (n=1)
+  current_record      : 100.00% (n=1)
+  temporal            : 100.00% (n=1)
+  scd                 : 100.00% (n=3)
+  scd_type2           : 100.00% (n=2)
+  window              : 100.00% (n=1)
+  history             : 100.00% (n=2)
+  dimension           : 100.00% (n=1)
+
+FAILED/ERROR TASKS
+----------------------------------------
+  ent_slowly_changing_merge: failed - validation failed
+
+============================================================

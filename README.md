@@ -288,6 +288,166 @@ print(f"Score: {result.match_score}")
 
 ---
 
+## AgentBeats Deployment (Docker)
+
+AgentX is fully compatible with the [AgentBeats](https://agentbeats.dev) platform for standardized agent evaluations. Deploy the Green Agent (evaluator) and Purple Agent (SQL generator) using Docker.
+
+### Docker Images
+
+| Image | Description | Docker Hub |
+|-------|-------------|------------|
+| `keshavdalmia10/agentx-green` | SQL Benchmark Evaluator (Green Agent) | [View](https://hub.docker.com/r/keshavdalmia10/agentx-green) |
+| `keshavdalmia10/agentx-purple` | LLM SQL Generator (Purple Agent) | [View](https://hub.docker.com/r/keshavdalmia10/agentx-purple) |
+
+### Quick Start with Docker Compose
+
+```bash
+# 1. Clone repository
+git clone https://github.com/ashcastelinocs124/AgentX-Hackathon.git
+cd AgentX-Hackathon
+
+# 2. Create environment file
+cp .env.example .env
+# Edit .env and add your GOOGLE_API_KEY (for Gemini)
+
+# 3. Start services
+docker-compose -f docker-compose.agentbeats.yml up -d
+
+# 4. Verify services are running
+curl http://localhost:8001/health  # Green Agent
+curl http://localhost:8080/health  # Purple Agent (Gemini)
+
+# 5. Run a tournament
+curl -X POST http://localhost:8001/assess \
+  -H "Content-Type: application/json" \
+  -d '{
+    "participants": {
+      "gemini": "http://agentx-purple-gemini:8080"
+    },
+    "config": {"task_count": 5, "difficulty": ["easy", "medium"]}
+  }'
+
+# 6. Stop services
+docker-compose -f docker-compose.agentbeats.yml down
+```
+
+### Run Individual Containers
+
+```bash
+# Pull images
+docker pull keshavdalmia10/agentx-green:latest
+docker pull keshavdalmia10/agentx-purple:latest
+
+# Start Green Agent (Evaluator)
+docker run -d --name agentx-green -p 8001:8001 \
+  keshavdalmia10/agentx-green:latest \
+  --host 0.0.0.0 --port 8001 --dialect sqlite --scorer-preset default
+
+# Start Purple Agent (Gemini SQL Generator)
+docker run -d --name agentx-purple -p 8080:8080 \
+  -e GOOGLE_API_KEY="your-api-key" \
+  keshavdalmia10/agentx-purple:latest \
+  --host 0.0.0.0 --port 8080 --llm gemini
+
+# Start Purple Agent (OpenAI SQL Generator)
+docker run -d --name agentx-purple-openai -p 8081:8081 \
+  -e OPENAI_API_KEY="your-api-key" \
+  keshavdalmia10/agentx-purple:latest \
+  --host 0.0.0.0 --port 8081 --llm openai
+```
+
+### Services Overview
+
+| Service | Port | Endpoints |
+|---------|------|-----------|
+| **Green Agent** | 8001 | `/health`, `/assess`, `/schema`, `/.well-known/agent.json` |
+| **Purple Agent** | 8080 | `/health`, `/generate`, `/.well-known/agent.json` |
+
+### Tournament API
+
+**Run Assessment:**
+```bash
+curl -X POST http://localhost:8001/assess \
+  -H "Content-Type: application/json" \
+  -d '{
+    "participants": {
+      "agent1": "http://agentx-purple-gemini:8080",
+      "agent2": "http://agentx-purple-openai:8081"
+    },
+    "config": {
+      "task_count": 10,
+      "difficulty": ["easy", "medium", "hard"],
+      "same_tasks": true,
+      "scorer_preset": "default"
+    }
+  }'
+```
+
+**Response Format:**
+```json
+{
+  "status": "completed",
+  "artifact": {
+    "rankings": [
+      {"rank": 1, "participant_id": "agent1", "overall_score": 0.92},
+      {"rank": 2, "participant_id": "agent2", "overall_score": 0.87}
+    ],
+    "participants": {
+      "agent1": {
+        "scores": {
+          "overall": 0.92,
+          "correctness": 0.95,
+          "efficiency": 0.88,
+          "safety": 1.0,
+          "hallucination_score": 1.0
+        }
+      }
+    }
+  }
+}
+```
+
+### Build from Source
+
+```bash
+# Build Green Agent
+docker build --platform linux/amd64 -f docker/Dockerfile.green -t agentx-green .
+
+# Build Purple Agent
+docker build --platform linux/amd64 -f docker/Dockerfile.purple -t agentx-purple .
+```
+
+### AgentBeats Scenario Configuration
+
+The `scenario.toml` file configures tournaments for the AgentBeats platform:
+
+```toml
+[scenario]
+name = "SQL Benchmark Tournament"
+description = "Evaluates SQL agents on correctness, efficiency, safety, and best practices"
+
+[green]
+name = "agentx-green"
+image = "keshavdalmia10/agentx-green:latest"
+
+[[purple]]
+name = "sql-agent-gemini"
+role = "sql_agent_1"
+image = "keshavdalmia10/agentx-purple:latest"
+
+[[purple]]
+name = "sql-agent-openai"
+role = "sql_agent_2"
+image = "keshavdalmia10/agentx-purple:latest"
+
+[config]
+difficulty = ["easy", "medium"]
+task_count = 10
+scorer_preset = "default"
+```
+
+---
+
 ## A2A Protocol Interface
 
 AgentX provides a standardized A2A (Agent-to-Agent) REST API for external agents to interact with the benchmark.
@@ -668,7 +828,18 @@ AgentX-Hackathon/
 │   ├── __init__.py                # Public exports
 │   ├── server.py                  # REST API server (Flask)
 │   ├── client.py                  # Client library for agents
-│   └── models.py                  # Request/response models
+│   ├── models.py                  # Request/response models
+│   │
+│   ├── green_agent/               # AgentBeats Green Agent (Evaluator)
+│   │   ├── __init__.py
+│   │   ├── sql_benchmark_agent.py # Main orchestrator
+│   │   ├── config.py              # Assessment configuration
+│   │   └── artifact_builder.py    # Tournament result builder
+│   │
+│   └── purple_agent/              # AgentBeats Purple Agent (SQL Generator)
+│       ├── __init__.py
+│       ├── sql_generator_agent.py # LLM-based SQL generator
+│       └── prompts.py             # SQL generation prompts
 │
 ├── evaluation/                    # Scoring system
 │   ├── data_structures.py         # ExecutionResult, ComparisonResult
@@ -678,13 +849,23 @@ AgentX-Hackathon/
 │   └── enhanced_scorer.py         # 7-dimension enhanced scorer
 │
 ├── docker/                        # Docker configuration
-│   └── init-postgres.sql          # PostgreSQL initialization
-├── Dockerfile                     # Container image definition
-├── docker-compose.yml             # Multi-service orchestration
+│   ├── init-postgres.sql          # PostgreSQL initialization
+│   ├── Dockerfile.green           # Green Agent container
+│   └── Dockerfile.purple          # Purple Agent container
+├── Dockerfile                     # Legacy container image
+├── docker-compose.yml             # Legacy multi-service orchestration
+├── docker-compose.agentbeats.yml  # AgentBeats deployment
 │
+├── entrypoint_green.py            # Green Agent CLI entrypoint
+├── entrypoint_purple.py           # Purple Agent CLI entrypoint
 ├── run_evaluation_pipeline.py     # CLI entry point
 ├── run_benchmark.py               # Benchmark runner with metrics export
-├── requirements.txt               # Dependencies
+│
+├── requirements.txt               # Core dependencies
+├── requirements-green.txt         # Green Agent dependencies
+├── requirements-purple.txt        # Purple Agent dependencies
+├── .env.example                   # Environment variables template
+├── scenario.toml                  # AgentBeats scenario config
 │
 ├── tasks/                         # Benchmark tasks
 │   ├── enterprise_schema.py       # Enterprise schema setup (19 tables)

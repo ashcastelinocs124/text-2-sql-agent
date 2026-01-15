@@ -1,0 +1,56 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: 37932ac5
+Started: 2026-01-02T20:17:02.085143+00:00
+Duration: 0.26 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  31
+Successful:   28
+Failed:       3
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  99.83%
+Median:   99.75%
+Min:      99.50%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 100.00%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 100.00%
+  best_practices      : 96.61%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  enterprise  : 99.83% (n=28)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  monitoring          : 100.00% (n=2)
+  churn               : 100.00% (n=1)
+  crosstab            : 100.00% (n=1)
+  data_quality        : 100.00% (n=3)
+  tree                : 100.00% (n=1)
+  point_in_time       : 100.00% (n=1)
+  validation          : 100.00% (n=1)
+  recursive           : 100.00% (n=2)
+  current_record      : 100.00% (n=1)
+  sequence            : 100.00% (n=1)
+
+FAILED/ERROR TASKS
+----------------------------------------
+  ent_late_arriving_facts: failed - no such column: sf.order_date
+  ent_inventory_forecast: failed - no such column: order_date
+  ent_complex_join_10_tables: failed - no such column: o.unit_price
+
+============================================================

@@ -1,0 +1,11 @@
+task_id,difficulty,status,overall_score,correctness,efficiency,safety,completeness,semantic_accuracy,best_practices,plan_quality,execution_time_ms,rows_returned,is_valid,matches_expected,error_message
+sqlite_simple_select,easy,success,0.8760666666666667,0.7,1.0,1.0,1.0,0.8606666666666667,0.9,1.0,0.01811981201171875,4,True,False,
+sqlite_count,easy,success,0.771,0.5,1.0,1.0,1.0,0.4600000000000001,1.0,1.0,0.008106231689453125,1,True,False,
+sqlite_where_filter,easy,success,0.9600000000000001,0.9,1.0,1.0,1.0,1.0,0.9,1.0,0.0152587890625,2,True,False,
+sqlite_aggregate_sum,easy,success,0.9974999999999999,1.0,1.0,1.0,1.0,1.0,0.95,1.0,0.023126602172851562,1,True,True,
+sqlite_aggregate_avg,easy,success,0.9974999999999999,1.0,1.0,1.0,1.0,1.0,0.95,1.0,0.009775161743164062,1,True,True,
+sqlite_string_functions,easy,success,0.9220454545454545,0.8,1.0,1.0,1.0,0.9454545454545455,0.95,1.0,0.018835067749023438,4,True,False,
+sqlite_null_handling,easy,success,0.9174999999999999,0.8,1.0,1.0,1.0,0.9000000000000001,0.95,1.0,0.025033950805664062,4,True,False,
+sqlite_distinct,easy,success,0.9062500000000001,0.775,1.0,1.0,1.0,0.875,0.95,1.0,0.02384185791015625,3,True,False,
+sqlite_order_limit,easy,success,0.9575,0.9,1.0,1.0,1.0,1.0,0.85,1.0,0.029802322387695312,3,True,False,
+sqlite_between,easy,success,0.9600000000000001,0.9,1.0,1.0,1.0,1.0,0.9,1.0,0.023126602172851562,4,True,False,

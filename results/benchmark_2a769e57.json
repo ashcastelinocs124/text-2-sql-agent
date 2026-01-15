@@ -1,0 +1,445 @@
+{
+  "benchmark_id": "2a769e57",
+  "started_at": "2026-01-02T06:12:08.747267+00:00",
+  "completed_at": "2026-01-02T06:12:08.753696+00:00",
+  "duration_seconds": 0.006429,
+  "config": {
+    "agent_url": null,
+    "tasks_path": null,
+    "output_dir": "results",
+    "difficulties": [
+      "easy"
+    ],
+    "tags": null,
+    "formats": [
+      "json",
+      "csv"
+    ],
+    "dialect": "sqlite",
+    "timeout": 30.0,
+    "verbose": false,
+    "schema": "basic"
+  },
+  "total_tasks": 10,
+  "successful": 10,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "average_score": 0.9265362121212121,
+  "median_score": 0.9575,
+  "min_score": 0.771,
+  "max_score": 0.9974999999999999,
+  "scores_by_dimension": {
+    "correctness": 0.8275,
+    "efficiency": 1.0,
+    "safety": 1.0,
+    "completeness": 1.0,
+    "semantic_accuracy": 0.9041121212121211,
+    "best_practices": 0.93,
+    "plan_quality": 1.0
+  },
+  "scores_by_difficulty": {
+    "easy": {
+      "count": 10,
+      "average": 0.9265362121212121,
+      "min": 0.771,
+      "max": 0.9974999999999999
+    }
+  },
+  "scores_by_tag": {
+    "coalesce": {
+      "count": 1,
+      "average": 0.9174999999999999
+    },
+    "distinct": {
+      "count": 1,
+      "average": 0.9062500000000001
+    },
+    "basic": {
+      "count": 1,
+      "average": 0.8760666666666667
+    },
+    "count": {
+      "count": 1,
+      "average": 0.771
+    },
+    "filter": {
+      "count": 2,
+      "average": 0.9600000000000001
+    },
+    "select": {
+      "count": 1,
+      "average": 0.8760666666666667
+    },
+    "functions": {
+      "count": 1,
+      "average": 0.9220454545454545
+    },
+    "null": {
+      "count": 1,
+      "average": 0.9174999999999999
+    },
+    "order": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "sort": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "avg": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "limit": {
+      "count": 1,
+      "average": 0.9575
+    },
+    "string": {
+      "count": 1,
+      "average": 0.9220454545454545
+    },
+    "unique": {
+      "count": 1,
+      "average": 0.9062500000000001
+    },
+    "between": {
+      "count": 1,
+      "average": 0.9600000000000001
+    },
+    "sum": {
+      "count": 1,
+      "average": 0.9974999999999999
+    },
+    "aggregation": {
+      "count": 3,
+      "average": 0.922
+    },
+    "where": {
+      "count": 1,
+      "average": 0.9600000000000001
+    }
+  },
+  "results": [
+    {
+      "task_id": "sqlite_simple_select",
+      "question": "Get all customer records with a limit of 10",
+      "difficulty": "easy",
+      "tags": [
+        "select",
+        "basic"
+      ],
+      "gold_sql": "SELECT * FROM customers LIMIT 10",
+      "agent_sql": "SELECT * FROM customers LIMIT 10",
+      "status": "success",
+      "overall_score": 0.8760666666666667,
+      "correctness": 0.7,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.8606666666666667,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.012159347534179688,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.7,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_count",
+      "question": "Count the total number of customers in the database",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "count"
+      ],
+      "gold_sql": "SELECT COUNT(*) as total FROM customers",
+      "agent_sql": "SELECT COUNT(*) as total FROM customers",
+      "status": "success",
+      "overall_score": 0.771,
+      "correctness": 0.5,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.4600000000000001,
+      "best_practices": 1.0,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.0059604644775390625,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.5,
+      "error_message": null,
+      "suggestions": []
+    },
+    {
+      "task_id": "sqlite_where_filter",
+      "question": "Find all customers who live in New York",
+      "difficulty": "easy",
+      "tags": [
+        "where",
+        "filter"
+      ],
+      "gold_sql": "SELECT * FROM customers WHERE city = 'New York'",
+      "agent_sql": "SELECT * FROM customers WHERE city = 'New York'",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.013113021850585938,
+      "rows_returned": 2,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    },
+    {
+      "task_id": "sqlite_aggregate_sum",
+      "question": "Calculate the total revenue from all orders",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "sum"
+      ],
+      "gold_sql": "SELECT SUM(total) as total_revenue FROM orders",
+      "agent_sql": "SELECT SUM(total) as total_revenue FROM orders",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.009059906005859375,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_aggregate_avg",
+      "question": "Calculate the average order value",
+      "difficulty": "easy",
+      "tags": [
+        "aggregation",
+        "avg"
+      ],
+      "gold_sql": "SELECT AVG(total) as avg_order_value FROM orders",
+      "agent_sql": "SELECT AVG(total) as avg_order_value FROM orders",
+      "status": "success",
+      "overall_score": 0.9974999999999999,
+      "correctness": 1.0,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.008106231689453125,
+      "rows_returned": 1,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": true,
+      "match_score": 1.0,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_string_functions",
+      "question": "Get customer names in uppercase along with the length of their names",
+      "difficulty": "easy",
+      "tags": [
+        "string",
+        "functions"
+      ],
+      "gold_sql": "SELECT UPPER(name) as upper_name, LENGTH(name) as name_length FROM customers",
+      "agent_sql": "SELECT UPPER(name) as upper_name, LENGTH(name) as name_length FROM customers",
+      "status": "success",
+      "overall_score": 0.9220454545454545,
+      "correctness": 0.8,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.9454545454545455,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.010013580322265625,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.8,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_null_handling",
+      "question": "Get customer names and phone numbers, showing 'N/A' for missing phone numbers",
+      "difficulty": "easy",
+      "tags": [
+        "null",
+        "coalesce"
+      ],
+      "gold_sql": "SELECT name, COALESCE(phone, 'N/A') as phone FROM customers",
+      "agent_sql": "SELECT name, COALESCE(phone, 'N/A') as phone FROM customers",
+      "status": "success",
+      "overall_score": 0.9174999999999999,
+      "correctness": 0.8,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.9000000000000001,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.008821487426757812,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.8,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_distinct",
+      "question": "Get a list of all unique cities where customers live",
+      "difficulty": "easy",
+      "tags": [
+        "distinct",
+        "unique"
+      ],
+      "gold_sql": "SELECT DISTINCT city FROM customers ORDER BY city",
+      "agent_sql": "SELECT DISTINCT city FROM customers ORDER BY city",
+      "status": "success",
+      "overall_score": 0.9062500000000001,
+      "correctness": 0.775,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 0.875,
+      "best_practices": 0.95,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.012159347534179688,
+      "rows_returned": 3,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.775,
+      "error_message": null,
+      "suggestions": [
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_order_limit",
+      "question": "Get the 3 most recent orders based on order date",
+      "difficulty": "easy",
+      "tags": [
+        "order",
+        "limit",
+        "sort"
+      ],
+      "gold_sql": "SELECT * FROM orders ORDER BY order_date DESC LIMIT 3",
+      "agent_sql": "SELECT * FROM orders ORDER BY order_date DESC LIMIT 3",
+      "status": "success",
+      "overall_score": 0.9575,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.85,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.0247955322265625,
+      "rows_returned": 3,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need",
+        "Consider adding a WHERE clause"
+      ]
+    },
+    {
+      "task_id": "sqlite_between",
+      "question": "Find orders with totals between 50 and 200 (inclusive)",
+      "difficulty": "easy",
+      "tags": [
+        "between",
+        "filter"
+      ],
+      "gold_sql": "SELECT * FROM orders WHERE total BETWEEN 50 AND 200",
+      "agent_sql": "SELECT * FROM orders WHERE total BETWEEN 50 AND 200",
+      "status": "success",
+      "overall_score": 0.9600000000000001,
+      "correctness": 0.9,
+      "efficiency": 1.0,
+      "safety": 1.0,
+      "completeness": 1.0,
+      "semantic_accuracy": 1.0,
+      "best_practices": 0.9,
+      "plan_quality": 1.0,
+      "execution_time_ms": 0.015735626220703125,
+      "rows_returned": 4,
+      "is_valid": true,
+      "validation_errors": [],
+      "phantom_tables": [],
+      "phantom_columns": [],
+      "matches_expected": false,
+      "match_score": 0.9,
+      "error_message": null,
+      "suggestions": [
+        "Specify only the columns you need"
+      ]
+    }
+  ]
+}

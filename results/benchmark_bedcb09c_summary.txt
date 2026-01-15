@@ -1,0 +1,55 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: bedcb09c
+Started: 2026-01-01T22:41:32.776344
+Duration: 0.06 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  17
+Successful:   16
+Failed:       1
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  94.40%
+Median:   96.00%
+Min:      77.10%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 86.82%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 93.41%
+  best_practices      : 93.44%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  easy        : 92.65% (n=10)
+  medium      : 97.31% (n=6)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  having              : 100.00% (n=1)
+  group_by            : 100.00% (n=1)
+  avg                 : 99.75% (n=1)
+  inner_join          : 99.75% (n=1)
+  case                : 99.75% (n=1)
+  sum                 : 99.75% (n=1)
+  conditional         : 99.75% (n=1)
+  join                : 96.06% (n=2)
+  subquery            : 96.00% (n=1)
+  in                  : 96.00% (n=2)
+
+FAILED/ERROR TASKS
+----------------------------------------
+  sqlite_group_by: failed - validation failed
+
+============================================================

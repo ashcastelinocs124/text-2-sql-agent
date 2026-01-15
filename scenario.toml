@@ -1,0 +1,37 @@
+# AgentBeats Scenario Configuration
+# SQL Benchmark Tournament between two SQL-generating agents
+
+[scenario]
+name = "SQL Benchmark Tournament"
+description = "Evaluates SQL agents on correctness, efficiency, safety, and best practices using AgentX 7-dimensional scoring"
+
+[green]
+name = "agentx-green"
+# Local development:
+command = "python entrypoint_green.py --port 8001 --dialect sqlite --scorer-preset default"
+# Docker (uncomment for production):
+# image = "ghcr.io/youruser/agentx-green:v1"
+
+[[purple]]
+name = "sql-agent-gemini"
+role = "sql_agent_1"
+# Local development:
+command = "python entrypoint_purple.py --port 8080 --llm gemini --name 'Gemini SQL Agent'"
+# Docker (uncomment for production):
+# image = "ghcr.io/youruser/agentx-purple:v1"
+
+[[purple]]
+name = "sql-agent-openai"
+role = "sql_agent_2"
+# Local development:
+command = "python entrypoint_purple.py --port 8081 --llm openai --name 'OpenAI SQL Agent'"
+# Docker (uncomment for production):
+# image = "ghcr.io/youruser/agentx-purple:v1"
+
+[config]
+difficulty = ["easy", "medium"]
+task_count = 5
+scorer_preset = "default"
+dialect = "sqlite"
+same_tasks = true
+parallel_evaluation = true

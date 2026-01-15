@@ -1,0 +1,53 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: 011ec373
+Started: 2026-01-02T20:15:40.392191+00:00
+Duration: 0.10 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  27
+Successful:   27
+Failed:       0
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  96.18%
+Median:   99.75%
+Min:      77.10%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 90.99%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 95.81%
+  best_practices      : 95.00%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  easy        : 92.65% (n=10)
+  medium      : 96.46% (n=7)
+  hard        : 99.83% (n=6)
+  enterprise  : 99.00% (n=4)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  median              : 100.00% (n=1)
+  percentile          : 100.00% (n=1)
+  correlated_subquery : 100.00% (n=1)
+  multiple_cte        : 100.00% (n=1)
+  having              : 100.00% (n=1)
+  window              : 99.81% (n=4)
+  growth              : 99.75% (n=1)
+  cohort              : 99.75% (n=1)
+  rank                : 99.75% (n=1)
+  sum                 : 99.75% (n=1)
+
+============================================================

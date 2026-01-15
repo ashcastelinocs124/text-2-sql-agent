@@ -1,0 +1,50 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: 8227a4e2
+Started: 2026-01-02T20:19:20.047258+00:00
+Duration: 0.26 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  31
+Successful:   31
+Failed:       0
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  99.84%
+Median:   99.75%
+Min:      99.50%
+Max:      100.00%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 100.00%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 100.00%
+  best_practices      : 96.77%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  enterprise  : 99.84% (n=31)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  data_quality        : 100.00% (n=4)
+  customer_360        : 100.00% (n=1)
+  prediction          : 100.00% (n=1)
+  manufacturing       : 100.00% (n=1)
+  join                : 100.00% (n=1)
+  scd_type2           : 100.00% (n=2)
+  anomaly             : 100.00% (n=1)
+  validation          : 100.00% (n=1)
+  crm                 : 100.00% (n=1)
+  history             : 100.00% (n=2)
+
+============================================================

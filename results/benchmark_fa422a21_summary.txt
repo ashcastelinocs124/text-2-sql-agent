@@ -1,0 +1,50 @@
+============================================================
+AGENTX BENCHMARK REPORT
+============================================================
+
+Benchmark ID: fa422a21
+Started: 2026-01-01T22:42:42.229377+00:00
+Duration: 0.07 seconds
+
+RESULTS SUMMARY
+----------------------------------------
+Total Tasks:  10
+Successful:   10
+Failed:       0
+Errors:       0
+
+SCORES
+----------------------------------------
+Average:  92.65%
+Median:   95.75%
+Min:      77.10%
+Max:      99.75%
+
+SCORES BY DIMENSION
+----------------------------------------
+  correctness         : 82.75%
+  efficiency          : 100.00%
+  safety              : 100.00%
+  completeness        : 100.00%
+  semantic_accuracy   : 90.41%
+  best_practices      : 93.00%
+  plan_quality        : 100.00%
+
+SCORES BY DIFFICULTY
+----------------------------------------
+  easy        : 92.65% (n=10)
+
+TOP TAGS BY SCORE
+----------------------------------------
+  sum                 : 99.75% (n=1)
+  avg                 : 99.75% (n=1)
+  where               : 96.00% (n=1)
+  filter              : 96.00% (n=2)
+  between             : 96.00% (n=1)
+  order               : 95.75% (n=1)
+  limit               : 95.75% (n=1)
+  sort                : 95.75% (n=1)
+  string              : 92.20% (n=1)
+  functions           : 92.20% (n=1)
+
+============================================================
