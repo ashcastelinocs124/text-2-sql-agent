@@ -324,6 +324,79 @@ SELECT user_id, SUM(new_session) OVER (...) as session_id FROM time_diffs
 | **Error Recovery** | Hallucination detection before execution |
 | **Best Practices** | Code quality scoring (avoiding anti-patterns) |
 
+### Why AgentX Tasks Are Not Trivial
+
+AgentX is designed to **avoid tasks solvable by simple heuristics**. Here's how our tasks compare:
+
+#### Trivial vs AgentX Task Comparison
+
+| Aspect | ❌ Trivial Benchmark | ✅ AgentX Task |
+|--------|---------------------|----------------|
+| **Query** | `SELECT * FROM users` | `SELECT name, total_spent FROM customers WHERE id IN (SELECT customer_id FROM orders GROUP BY customer_id HAVING SUM(total) > 500)` |
+| **Reasoning** | Template matching | Multi-step planning required |
+| **Schema** | Single table | 19-table enterprise schema with relationships |
+| **Evaluation** | Binary pass/fail | 7-dimensional nuanced scoring |
+| **Error Insight** | "Query failed" | "Wrong column: used `user_name` instead of `name` (schema_error)" |
+
+#### Why Simple Heuristics Fail on AgentX
+
+| Heuristic | Why It Fails |
+|-----------|--------------|
+| "Just use SELECT *" | Best practices score penalizes SELECT * |
+| "Match keywords to columns" | Enterprise schema has similar column names across tables |
+| "Use first table mentioned" | Star schema requires correct fact-dimension joins |
+| "Copy SQL patterns" | Sessionization, SCD queries require semantic understanding |
+| "Ignore schema relationships" | Foreign key joins are required for correct results |
+
+#### Task Complexity Examples
+
+**❌ Trivial (WikiSQL-style):**
+```sql
+-- Question: "How many employees are there?"
+SELECT COUNT(*) FROM employees
+-- Solvable by: keyword matching "count" → COUNT(*)
+```
+
+**✅ AgentX Medium:**
+```sql
+-- Question: "Find customers who have placed orders with a total greater than 100"
+SELECT * FROM customers 
+WHERE id IN (SELECT customer_id FROM orders WHERE total > 100)
+-- Requires: Understanding two tables, subquery planning, correct join logic
+```
+
+**✅ AgentX Enterprise:**
+```sql
+-- Question: "Calculate cohort retention: for each monthly cohort, 
+--            show what percentage of customers made purchases in subsequent months"
+WITH first_purchase AS (
+  SELECT customer_id, strftime('%Y-%m', MIN(order_date)) as cohort_month
+  FROM orders_fact GROUP BY customer_id
+),
+monthly_activity AS (
+  SELECT o.customer_id, f.cohort_month,
+    (strftime('%Y', o.order_date) - strftime('%Y', f.cohort_month || '-01')) * 12 +
+    (strftime('%m', o.order_date) - strftime('%m', f.cohort_month || '-01')) as months_since
+  FROM orders_fact o JOIN first_purchase f ON o.customer_id = f.customer_id
+)
+SELECT cohort_month, months_since, 
+  COUNT(DISTINCT customer_id) as active_customers,
+  ROUND(COUNT(DISTINCT customer_id) * 100.0 / 
+    FIRST_VALUE(COUNT(DISTINCT customer_id)) OVER (PARTITION BY cohort_month ORDER BY months_since), 2) as retention_rate
+FROM monthly_activity
+GROUP BY cohort_month, months_since
+-- Requires: CTEs, window functions, date arithmetic, multi-step aggregation
+```
+
+#### Complexity Metrics
+
+| Difficulty | Avg Tables | Avg Joins | Uses CTEs | Uses Window Funcs | Subqueries |
+|------------|------------|-----------|-----------|-------------------|------------|
+| Easy | 1.0 | 0 | 0% | 0% | 10% |
+| Medium | 1.8 | 0.8 | 20% | 0% | 40% |
+| Hard | 2.5 | 1.5 | 60% | 80% | 30% |
+| Enterprise | 3.2 | 2.4 | 70% | 60% | 50% |
+
 ---
 
 ## Evaluation Methodology
