@@ -1,4 +1,4 @@
-# AgentX AgentBeats Deployment
+# Text-2-SQL Agent AgentBeats Deployment
 #
 # Usage:
 #   docker-compose -f docker-compose.agentbeats.yml up -d

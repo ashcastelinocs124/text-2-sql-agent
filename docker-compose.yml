@@ -1,4 +1,4 @@
-# AgentX SQL Benchmark - Docker Compose
+# Text-2-SQL Agent SQL Benchmark - Docker Compose
 #
 # Usage:
 #   # Start with SQLite (default, zero setup)
@@ -17,7 +17,7 @@ version: '3.8'
 
 services:
   # =============================================================================
-  # MAIN SERVICE: AgentX A2A Server (SQLite)
+  # MAIN SERVICE: Text-2-SQL Agent A2A Server (SQLite)
   # =============================================================================
   agentx:
     build:

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AgentX is a multi-dialect SQL evaluation framework for LLM-powered SQL agents. It provides hallucination detection, multi-dimensional scoring, and an A2A (Agent-to-Agent) REST API interface.
+Text-2-SQL Agent is a multi-dialect SQL evaluation framework for LLM-powered SQL agents. It provides hallucination detection, multi-dimensional scoring, and an A2A (Agent-to-Agent) REST API interface.
 
 ## Common Commands
 

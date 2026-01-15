@@ -1,4 +1,4 @@
-# AgentX: Enterprise SQL Benchmark for A2A Agents
+# Text-2-SQL Agent: Enterprise SQL Benchmark for A2A Agents
 
 > A comprehensive, reproducible benchmark framework for evaluating LLM-powered SQL agents with multi-dimensional scoring, hallucination detection, and standardized A2A protocol support.
 
@@ -12,7 +12,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [What Makes AgentX Unique](#what-makes-agentx-unique)
+- [What Makes Text-2-SQL Agent Unique](#what-makes-text-2-sql-agent-unique)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Benchmark Design Quality](#benchmark-design-quality)
@@ -29,7 +29,7 @@
 
 ## Overview
 
-**AgentX** is a standardized SQL benchmark designed to evaluate AI agents' ability to generate correct, efficient, and safe SQL queries. Unlike simple pass/fail benchmarks, AgentX provides:
+**Text-2-SQL Agent** is a standardized SQL benchmark designed to evaluate AI agents' ability to generate correct, efficient, and safe SQL queries. Unlike simple pass/fail benchmarks, Text-2-SQL Agent provides:
 
 - **7-Dimensional Scoring**: Correctness, Efficiency, Safety, Completeness, Semantic Accuracy, Best Practices, Plan Quality
 - **Hallucination Detection**: Pre-execution detection of phantom tables, columns, and invalid functions
@@ -46,11 +46,11 @@
 
 ---
 
-## What Makes AgentX Unique
+## What Makes Text-2-SQL Agent Unique
 
 ### 1. Beyond Binary Pass/Fail
 
-Traditional SQL benchmarks only check if queries execute and return correct results. AgentX evaluates **how** the SQL was generated:
+Traditional SQL benchmarks only check if queries execute and return correct results. Text-2-SQL Agent evaluates **how** the SQL was generated:
 
 | Dimension | What It Measures | Why It Matters |
 |-----------|------------------|----------------|
@@ -64,7 +64,7 @@ Traditional SQL benchmarks only check if queries execute and return correct resu
 
 ### 2. Pre-Execution Hallucination Detection
 
-AgentX detects **phantom identifiers** before execution, preventing cryptic database errors:
+Text-2-SQL Agent detects **phantom identifiers** before execution, preventing cryptic database errors:
 
 ```
 Query: SELECT fake_column FROM nonexistent_table
@@ -79,7 +79,7 @@ Query: SELECT fake_column FROM nonexistent_table
 
 ### 3. Error Category Classification
 
-Inspired by [research on SQL generation failures](https://arxiv.org/abs/2411.07763), AgentX classifies errors into actionable categories:
+Inspired by [research on SQL generation failures](https://arxiv.org/abs/2411.07763), Text-2-SQL Agent classifies errors into actionable categories:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -105,7 +105,7 @@ Inspired by [research on SQL generation failures](https://arxiv.org/abs/2411.077
 
 ### 4. Standardized A2A Protocol
 
-AgentX implements the AgentBeats A2A protocol for reproducible agent tournaments:
+Text-2-SQL Agent implements the AgentBeats A2A protocol for reproducible agent tournaments:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -116,7 +116,7 @@ AgentX implements the AgentBeats A2A protocol for reproducible agent tournaments
 │  │ GREEN AGENT │ ───────────▶ │     PURPLE AGENTS       │   │
 │  │ (Evaluator) │              │  ┌─────────┐ ┌────────┐ │   │
 │  │             │ ◀─────────── │  │ Agent A │ │Agent B │ │   │
-│  │ AgentX      │    SQL       │  │ (GPT-4) │ │(Gemini)│ │   │
+│  │ Text-2-SQL  │    SQL       │  │ (GPT-4) │ │(Gemini)│ │   │
 │  └─────────────┘  Responses   │  └─────────┘ └────────┘ │   │
 │         │                     └─────────────────────────┘   │
 │         ▼                                                    │
@@ -133,7 +133,7 @@ AgentX implements the AgentBeats A2A protocol for reproducible agent tournaments
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          AGENTX EVALUATION SYSTEM                           │
+│                      TEXT-2-SQL AGENT EVALUATION SYSTEM                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
@@ -204,8 +204,8 @@ AgentX implements the AgentBeats A2A protocol for reproducible agent tournaments
 
 ```bash
 # Clone repository
-git clone https://github.com/ashcastelinocs124/AgentX-Hackathon.git
-cd AgentX-Hackathon
+git clone https://github.com/ashcastelinocs124/text-2-sql-agent.git
+cd text-2-sql-agent
 
 # Create environment file
 cp .env.example .env
@@ -240,8 +240,8 @@ docker-compose -f docker-compose.agentbeats.yml down
 
 ```bash
 # Clone repository
-git clone https://github.com/ashcastelinocs124/AgentX-Hackathon.git
-cd AgentX-Hackathon
+git clone https://github.com/ashcastelinocs124/text-2-sql-agent.git
+cd text-2-sql-agent
 
 # Create virtual environment
 python -m venv venv
@@ -281,7 +281,7 @@ executor.close()
 
 ### Task Difficulty Progression
 
-AgentX provides **27+ SQL tasks** across 4 difficulty levels:
+Text-2-SQL Agent provides **27+ SQL tasks** across 4 difficulty levels:
 
 | Difficulty | Tasks | Skills Tested |
 |------------|-------|---------------|
@@ -316,7 +316,7 @@ SELECT user_id, SUM(new_session) OVER (...) as session_id FROM time_diffs
 
 ### Agentic Capability Testing
 
-| Capability | How AgentX Tests It |
+| Capability | How Text-2-SQL Agent Tests It |
 |------------|---------------------|
 | **Schema Understanding** | Agents must correctly identify tables/columns from schema |
 | **Multi-step Reasoning** | Complex queries require planning (CTEs, subqueries) |
@@ -324,13 +324,13 @@ SELECT user_id, SUM(new_session) OVER (...) as session_id FROM time_diffs
 | **Error Recovery** | Hallucination detection before execution |
 | **Best Practices** | Code quality scoring (avoiding anti-patterns) |
 
-### Why AgentX Tasks Are Not Trivial
+### Why Text-2-SQL Agent Tasks Are Not Trivial
 
-AgentX is designed to **avoid tasks solvable by simple heuristics**. Here's how our tasks compare:
+Text-2-SQL Agent is designed to **avoid tasks solvable by simple heuristics**. Here's how our tasks compare:
 
-#### Trivial vs AgentX Task Comparison
+#### Trivial vs Text-2-SQL Agent Task Comparison
 
-| Aspect | ❌ Trivial Benchmark | ✅ AgentX Task |
+| Aspect | ❌ Trivial Benchmark | ✅ Text-2-SQL Agent Task |
 |--------|---------------------|----------------|
 | **Query** | `SELECT * FROM users` | `SELECT name, total_spent FROM customers WHERE id IN (SELECT customer_id FROM orders GROUP BY customer_id HAVING SUM(total) > 500)` |
 | **Reasoning** | Template matching | Multi-step planning required |
@@ -338,7 +338,7 @@ AgentX is designed to **avoid tasks solvable by simple heuristics**. Here's how 
 | **Evaluation** | Binary pass/fail | 7-dimensional nuanced scoring |
 | **Error Insight** | "Query failed" | "Wrong column: used `user_name` instead of `name` (schema_error)" |
 
-#### Why Simple Heuristics Fail on AgentX
+#### Why Simple Heuristics Fail on Text-2-SQL Agent
 
 | Heuristic | Why It Fails |
 |-----------|--------------|
@@ -357,7 +357,7 @@ SELECT COUNT(*) FROM employees
 -- Solvable by: keyword matching "count" → COUNT(*)
 ```
 
-**✅ AgentX Medium:**
+**✅ Text-2-SQL Agent Medium:**
 ```sql
 -- Question: "Find customers who have placed orders with a total greater than 100"
 SELECT * FROM customers 
@@ -365,7 +365,7 @@ WHERE id IN (SELECT customer_id FROM orders WHERE total > 100)
 -- Requires: Understanding two tables, subquery planning, correct join logic
 ```
 
-**✅ AgentX Enterprise:**
+**✅ Text-2-SQL Agent Enterprise:**
 ```sql
 -- Question: "Calculate cohort retention: for each monthly cohort, 
 --            show what percentage of customers made purchases in subsequent months"
@@ -454,7 +454,7 @@ All evaluation is **fully automated** with no manual intervention:
 
 ## Error Category Metrics
 
-AgentX classifies errors to provide actionable debugging insights:
+Text-2-SQL Agent classifies errors to provide actionable debugging insights:
 
 ### Error Categories
 
@@ -547,7 +547,7 @@ docker build --platform linux/amd64 -f docker/Dockerfile.purple -t agentx-purple
 
 ## Robust Error Handling & Logging
 
-AgentX implements production-grade resilience patterns to ensure reliable operation during agent tournaments and benchmarks.
+Text-2-SQL Agent implements production-grade resilience patterns to ensure reliable operation during agent tournaments and benchmarks.
 
 ### Circuit Breaker Pattern
 
@@ -695,7 +695,7 @@ logging.getLogger('agentx.executor').setLevel(logging.INFO)  # SQL execution
 
 ### Consistent Results Guarantee
 
-AgentX ensures reproducible benchmark runs through:
+Text-2-SQL Agent ensures reproducible benchmark runs through:
 
 | Feature | Implementation |
 |---------|----------------|
@@ -846,7 +846,7 @@ POST /assess
 
 ### Addressing Evaluation Gaps
 
-| Gap in Existing Benchmarks | AgentX Solution |
+| Gap in Existing Benchmarks | Text-2-SQL Agent Solution |
 |----------------------------|-----------------|
 | Binary pass/fail only | 7-dimensional nuanced scoring |
 | No hallucination tracking | Pre-execution phantom detection |
@@ -863,7 +863,7 @@ POST /assess
 
 ### Complementary to Existing Benchmarks
 
-| Benchmark | Focus | AgentX Complement |
+| Benchmark | Focus | Text-2-SQL Agent Complement |
 |-----------|-------|-------------------|
 | Spider | Schema understanding | + Safety & efficiency scoring |
 | BIRD | Complex queries | + Hallucination detection |
@@ -885,13 +885,13 @@ Contributions welcome! Please see our [contribution guidelines](CONTRIBUTING.md)
 
 ## Citation
 
-If you use AgentX in your research, please cite:
+If you use Text-2-SQL Agent in your research, please cite:
 
 ```bibtex
-@software{agentx2025,
-  title = {AgentX: Enterprise SQL Benchmark for A2A Agents},
+@software{text2sqlagent2025,
+  title = {Text-2-SQL Agent: Enterprise SQL Benchmark for A2A Agents},
   author = {Dalmia, Keshav},
   year = {2025},
-  url = {https://github.com/ashcastelinocs124/AgentX-Hackathon}
+  url = {https://github.com/ashcastelinocs124/text-2-sql-agent}
 }
 ```
