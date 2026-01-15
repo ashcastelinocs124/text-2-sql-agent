@@ -19,7 +19,7 @@ services:
       - "8001:8001"
     command: ["--host", "0.0.0.0", "--port", "8001", "--dialect", "sqlite", "--scorer-preset", "default"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -41,7 +41,7 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     command: ["--host", "0.0.0.0", "--port", "8080", "--llm", "gemini", "--name", "Gemini SQL Agent"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -63,7 +63,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: ["--host", "0.0.0.0", "--port", "8081", "--llm", "openai", "--name", "OpenAI SQL Agent"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')"]
       interval: 30s
       timeout: 10s
       retries: 3

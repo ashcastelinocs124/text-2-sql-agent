@@ -139,10 +139,14 @@ class TaskResult:
     phantom_tables: List[str] = field(default_factory=list)
     phantom_columns: List[str] = field(default_factory=list)
     error_message: Optional[str] = None
+    # Error classification for metrics tracking
+    error_category: Optional[str] = None
+    error_subcategory: Optional[str] = None
+    error_details: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
-        return {
+        result = {
             "task_id": self.task_id,
             "question": self.question,
             "sql_submitted": self.sql_submitted,
@@ -156,6 +160,14 @@ class TaskResult:
             "phantom_columns": self.phantom_columns,
             "error_message": self.error_message,
         }
+        # Include error classification if present
+        if self.error_category:
+            result["error_classification"] = {
+                "category": self.error_category,
+                "subcategory": self.error_subcategory,
+                "details": self.error_details,
+            }
+        return result
 
 
 @dataclass
@@ -168,10 +180,12 @@ class ParticipantSummary:
     failed: int
     scores: ScoreSummary
     task_results: List[TaskResult] = field(default_factory=list)
+    # Error metrics for this participant
+    error_metrics: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
-        return {
+        result = {
             "participant_id": self.participant_id,
             "endpoint": self.endpoint,
             "total_tasks": self.total_tasks,
@@ -180,6 +194,9 @@ class ParticipantSummary:
             "scores": self.scores.to_dict(),
             "task_results": [r.to_dict() for r in self.task_results],
         }
+        if self.error_metrics:
+            result["error_metrics"] = self.error_metrics
+        return result
 
 
 @dataclass
@@ -213,10 +230,12 @@ class AssessmentArtifact:
     participants: Dict[str, ParticipantSummary]
     task_comparison: List[Dict[str, Any]] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    # Aggregate error metrics across all participants
+    error_metrics_summary: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for A2A artifact."""
-        return {
+        result = {
             "assessment_id": self.assessment_id,
             "completed_at": self.completed_at,
             "config": self.config,
@@ -227,6 +246,9 @@ class AssessmentArtifact:
             "task_comparison": self.task_comparison,
             "metadata": self.metadata,
         }
+        if self.error_metrics_summary:
+            result["error_metrics_summary"] = self.error_metrics_summary
+        return result
 
     def to_json(self) -> str:
         """Serialize to JSON string."""

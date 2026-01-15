@@ -15,10 +15,25 @@ from .config import (
     RankedParticipant,
     AssessmentArtifact,
 )
+from .error_metrics import (
+    SQLErrorClassifier,
+    ErrorMetricsSummary,
+    create_error_classifier,
+)
 
 
 class ArtifactBuilder:
     """Builds assessment artifacts from evaluation results."""
+
+    # Shared classifier instance
+    _classifier: SQLErrorClassifier = None
+
+    @classmethod
+    def _get_classifier(cls) -> SQLErrorClassifier:
+        """Get or create the error classifier."""
+        if cls._classifier is None:
+            cls._classifier = create_error_classifier()
+        return cls._classifier
 
     @staticmethod
     def build(
@@ -37,15 +52,55 @@ class ArtifactBuilder:
             results: Mapping of participant_id to list of TaskResults
 
         Returns:
-            AssessmentArtifact with rankings and detailed scores
+            AssessmentArtifact with rankings, detailed scores, and error metrics
         """
         participant_summaries: Dict[str, ParticipantSummary] = {}
+        classifier = ArtifactBuilder._get_classifier()
+
+        # Aggregate error metrics across all participants
+        aggregate_metrics = ErrorMetricsSummary()
 
         for pid, task_results in results.items():
+            # Classify errors for each task result
+            participant_metrics = ErrorMetricsSummary()
+
+            for task_result in task_results:
+                classification = classifier.classify(
+                    sql_submitted=task_result.sql_submitted,
+                    gold_sql=task_result.gold_sql,
+                    execution_success=task_result.execution_success,
+                    validation_errors=task_result.validation_errors,
+                    phantom_tables=task_result.phantom_tables,
+                    phantom_columns=task_result.phantom_columns,
+                    error_message=task_result.error_message,
+                    match_score=task_result.scores.correctness,
+                    correctness_score=task_result.scores.overall,
+                )
+
+                # Update task result with classification
+                task_result.error_category = classification.category.value
+                task_result.error_subcategory = classification.subcategory.value
+                task_result.error_details = classification.details
+
+                # Add to participant metrics
+                participant_metrics.add_classification(
+                    classification,
+                    task_result.task_id,
+                    task_result.sql_submitted,
+                )
+
+                # Add to aggregate metrics
+                aggregate_metrics.add_classification(
+                    classification,
+                    f"{pid}:{task_result.task_id}",
+                    task_result.sql_submitted,
+                )
+
             summary = ArtifactBuilder._build_participant_summary(
                 participant_id=pid,
                 endpoint=participants.get(pid, ""),
                 task_results=task_results,
+                error_metrics=participant_metrics.to_dict(),
             )
             participant_summaries[pid] = summary
 
@@ -75,7 +130,8 @@ class ArtifactBuilder:
             metadata={
                 "total_tasks_evaluated": sum(len(tr) for tr in results.values()),
                 "total_participants": len(participants),
-            }
+            },
+            error_metrics_summary=aggregate_metrics.to_dict(),
         )
 
     @staticmethod
@@ -83,6 +139,7 @@ class ArtifactBuilder:
         participant_id: str,
         endpoint: str,
         task_results: List[TaskResult],
+        error_metrics: Dict[str, Any] = None,
     ) -> ParticipantSummary:
         """Build summary for a single participant."""
         if not task_results:
@@ -103,6 +160,7 @@ class ArtifactBuilder:
                     plan_quality=0.0,
                 ),
                 task_results=[],
+                error_metrics=error_metrics,
             )
 
         # Calculate aggregate scores
@@ -120,6 +178,7 @@ class ArtifactBuilder:
             failed=failed,
             scores=avg_scores,
             task_results=task_results,
+            error_metrics=error_metrics,
         )
 
     @staticmethod

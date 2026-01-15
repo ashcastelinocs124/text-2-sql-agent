@@ -4,6 +4,11 @@ AgentBeats-compatible entrypoint for AgentX Green Agent.
 
 Starts the SQL Benchmark Green Agent server that evaluates Purple Agents.
 
+Features:
+- Async-native with Quart (Flask-compatible)
+- Resilient HTTP communication with retry and circuit breaker
+- Health/readiness probes for Kubernetes
+
 Usage:
     python entrypoint_green.py --host 0.0.0.0 --port 8001
     python entrypoint_green.py --port 8001 --dialect sqlite --scorer-preset strict
@@ -19,20 +24,22 @@ from typing import Any, Dict
 # Add paths
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from flask import Flask, request, jsonify, Response
-from flask_cors import CORS
+from quart import Quart, request, jsonify, Response
+from quart_cors import cors
 
 from a2a.green_agent import SQLBenchmarkGreenAgent, AssessmentConfig
+from a2a.health import HealthChecker
+from a2a.resilience import ResilientHTTPClient, TimeoutConfig
 
 
 def create_app(
     dialect: str = "sqlite",
     scorer_preset: str = "default",
     card_url: str = None,
-) -> Flask:
-    """Create Flask app for Green Agent."""
-    app = Flask(__name__)
-    CORS(app)
+) -> Quart:
+    """Create Quart app for Green Agent."""
+    app = Quart(__name__)
+    cors(app)
 
     # Initialize Green Agent
     agent = SQLBenchmarkGreenAgent(
@@ -40,8 +47,14 @@ def create_app(
         scorer_preset=scorer_preset,
     )
 
+    # Initialize resilient HTTP client
+    http_client = ResilientHTTPClient(TimeoutConfig())
+
+    # Initialize health checker
+    health_checker = HealthChecker(agent=agent, version="1.0.0")
+
     @app.route("/", methods=["GET"])
-    def index():
+    async def index():
         """Agent info endpoint."""
         return jsonify({
             "name": "AgentX SQL Benchmark",
@@ -51,8 +64,10 @@ def create_app(
             "endpoints": {
                 "info": "GET /",
                 "health": "GET /health",
+                "ready": "GET /ready",
                 "schema": "GET /schema",
                 "assess": "POST /assess",
+                "assess_stream": "POST /assess/stream",
                 "agent_card": "GET /.well-known/agent.json",
             },
             "capabilities": {
@@ -60,22 +75,49 @@ def create_app(
                 "supported_dialects": ["sqlite", "duckdb", "postgresql"],
                 "multi_agent": True,
                 "streaming": True,
+                "resilience": {
+                    "retry": True,
+                    "circuit_breaker": True,
+                    "adaptive_timeouts": True,
+                }
             }
         })
 
     @app.route("/health", methods=["GET"])
-    def health():
-        """Health check endpoint."""
-        return jsonify({"status": "healthy"})
+    async def health():
+        """
+        Liveness probe endpoint.
+
+        Quick check to verify process is alive.
+        Used by Kubernetes liveness probes.
+        """
+        status = await health_checker.check_liveness()
+        return jsonify(status.to_dict())
+
+    @app.route("/ready", methods=["GET"])
+    async def ready():
+        """
+        Readiness probe endpoint.
+
+        Full check to verify service can handle requests.
+        Used by Kubernetes readiness probes.
+        """
+        # Add executor to health checker for database check
+        if agent._executor:
+            health_checker.executor = agent._executor
+
+        status = await health_checker.check_readiness()
+        code = 200 if status.ready else 503
+        return jsonify(status.to_dict()), code
 
     @app.route("/schema", methods=["GET"])
-    def schema():
+    async def schema():
         """Get database schema for Purple Agents."""
         schema_info = agent.get_schema_info()
         return jsonify(schema_info)
 
     @app.route("/.well-known/agent.json", methods=["GET"])
-    def agent_card():
+    async def agent_card():
         """A2A Agent Card endpoint."""
         return jsonify({
             "name": "AgentX SQL Benchmark",
@@ -100,7 +142,7 @@ def create_app(
         })
 
     @app.route("/assess", methods=["POST"])
-    def assess():
+    async def assess():
         """
         Start an assessment.
 
@@ -117,7 +159,7 @@ def create_app(
             }
         }
         """
-        data = request.get_json()
+        data = await request.get_json()
 
         if not data:
             return jsonify({"error": "Request body required"}), 400
@@ -128,20 +170,11 @@ def create_app(
         if not participants:
             return jsonify({"error": "No participants specified"}), 400
 
-        # Run assessment synchronously (for simplicity)
-        # In production, use async/streaming
-        def run_assessment():
-            results = []
-
-            async def collect_updates():
-                async for update in agent.handle_assessment(participants, config):
-                    results.append(update.to_dict())
-
-            asyncio.run(collect_updates())
-            return results
-
         try:
-            updates = run_assessment()
+            # Run assessment asynchronously (native async)
+            updates = []
+            async for update in agent.handle_assessment(participants, config):
+                updates.append(update.to_dict())
 
             # Find the final artifact
             final_update = updates[-1] if updates else {}
@@ -160,13 +193,13 @@ def create_app(
             }), 500
 
     @app.route("/assess/stream", methods=["POST"])
-    def assess_stream():
+    async def assess_stream():
         """
         Start an assessment with streaming updates.
 
         Returns Server-Sent Events (SSE) stream.
         """
-        data = request.get_json()
+        data = await request.get_json()
 
         if not data:
             return jsonify({"error": "Request body required"}), 400
@@ -177,24 +210,13 @@ def create_app(
         if not participants:
             return jsonify({"error": "No participants specified"}), 400
 
-        def generate():
-            async def stream_updates():
+        async def generate():
+            """Async generator for SSE stream."""
+            try:
                 async for update in agent.handle_assessment(participants, config):
                     yield f"data: {json.dumps(update.to_dict())}\n\n"
-
-            # Run async generator synchronously
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                gen = stream_updates()
-                while True:
-                    try:
-                        update = loop.run_until_complete(gen.__anext__())
-                        yield update
-                    except StopAsyncIteration:
-                        break
-            finally:
-                loop.close()
+            except Exception as e:
+                yield f"data: {json.dumps({'status': 'error', 'error': str(e)})}\n\n"
 
         return Response(
             generate(),
@@ -202,8 +224,21 @@ def create_app(
             headers={
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
             }
         )
+
+    @app.before_serving
+    async def startup():
+        """Initialize resources on startup."""
+        print("Green Agent starting up...")
+
+    @app.after_serving
+    async def shutdown():
+        """Clean up resources on shutdown."""
+        print("Green Agent shutting down...")
+        await http_client.close()
+        agent.close()
 
     return app
 
@@ -259,11 +294,24 @@ def main():
         card_url=card_url,
     )
 
-    app.run(
-        host=args.host,
-        port=args.port,
-        debug=args.debug,
-    )
+    # Use hypercorn for production-ready async server
+    try:
+        from hypercorn.config import Config
+        from hypercorn.asyncio import serve
+
+        config = Config()
+        config.bind = [f"{args.host}:{args.port}"]
+        config.accesslog = "-"  # Log to stdout
+
+        asyncio.run(serve(app, config))
+    except ImportError:
+        # Fallback to Quart's built-in server (development only)
+        print("Warning: hypercorn not installed, using development server")
+        app.run(
+            host=args.host,
+            port=args.port,
+            debug=args.debug,
+        )
 
 
 if __name__ == "__main__":

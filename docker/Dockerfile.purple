@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements-purple.txt
 # Copy application code
 COPY a2a/purple_agent/ ./a2a/purple_agent/
 COPY a2a/__init__.py ./a2a/
+COPY a2a/health.py ./a2a/
+COPY a2a/resilience.py ./a2a/
 COPY entrypoint_purple.py .
 
 # Create non-root user

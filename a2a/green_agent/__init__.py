@@ -9,6 +9,14 @@ A2A protocol.
 from .config import AssessmentConfig, TaskUpdate, AssessmentArtifact
 from .sql_benchmark_agent import SQLBenchmarkGreenAgent
 from .artifact_builder import ArtifactBuilder
+from .error_metrics import (
+    SQLErrorClassifier,
+    ErrorMetricsSummary,
+    ErrorCategory,
+    ErrorSubcategory,
+    ErrorClassification,
+    create_error_classifier,
+)
 
 __all__ = [
     "SQLBenchmarkGreenAgent",
@@ -16,4 +24,10 @@ __all__ = [
     "TaskUpdate",
     "AssessmentArtifact",
     "ArtifactBuilder",
+    "SQLErrorClassifier",
+    "ErrorMetricsSummary",
+    "ErrorCategory",
+    "ErrorSubcategory",
+    "ErrorClassification",
+    "create_error_classifier",
 ]

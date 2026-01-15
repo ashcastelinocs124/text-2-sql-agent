@@ -4,22 +4,28 @@ AgentBeats-compatible entrypoint for Sample Purple Agent (SQL Generator).
 
 Starts a Purple Agent server that generates SQL using LLMs.
 
+Features:
+- Async-native with Quart (Flask-compatible)
+- Health/readiness probes for Kubernetes
+
 Usage:
     python entrypoint_purple.py --host 0.0.0.0 --port 8080 --llm gemini
     python entrypoint_purple.py --port 8081 --llm openai --model gpt-4o
 """
 
 import argparse
+import asyncio
 import os
 import sys
 
 # Add paths
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from quart import Quart, request, jsonify
+from quart_cors import cors
 
 from a2a.purple_agent import SampleSQLAgent
+from a2a.health import HealthChecker
 
 
 def create_app(
@@ -28,10 +34,10 @@ def create_app(
     api_key: str = None,
     card_url: str = None,
     agent_name: str = "Sample SQL Agent",
-) -> Flask:
-    """Create Flask app for Purple Agent."""
-    app = Flask(__name__)
-    CORS(app)
+) -> Quart:
+    """Create Quart app for Purple Agent."""
+    app = Quart(__name__)
+    cors(app)
 
     # Initialize SQL Agent
     agent = SampleSQLAgent(
@@ -40,8 +46,11 @@ def create_app(
         api_key=api_key,
     )
 
+    # Initialize health checker
+    health_checker = HealthChecker(agent=agent, version="1.0.0")
+
     @app.route("/", methods=["GET"])
-    def index():
+    async def index():
         """Agent info endpoint."""
         return jsonify({
             "name": agent_name,
@@ -51,6 +60,7 @@ def create_app(
             "endpoints": {
                 "info": "GET /",
                 "health": "GET /health",
+                "ready": "GET /ready",
                 "generate": "POST /generate",
                 "agent_card": "GET /.well-known/agent.json",
             },
@@ -61,12 +71,30 @@ def create_app(
         })
 
     @app.route("/health", methods=["GET"])
-    def health():
-        """Health check endpoint."""
-        return jsonify({"status": "healthy"})
+    async def health():
+        """
+        Liveness probe endpoint.
+
+        Quick check to verify process is alive.
+        Used by Kubernetes liveness probes.
+        """
+        status = await health_checker.check_liveness()
+        return jsonify(status.to_dict())
+
+    @app.route("/ready", methods=["GET"])
+    async def ready():
+        """
+        Readiness probe endpoint.
+
+        Full check to verify service can handle requests.
+        Used by Kubernetes readiness probes.
+        """
+        status = await health_checker.check_readiness()
+        code = 200 if status.ready else 503
+        return jsonify(status.to_dict()), code
 
     @app.route("/.well-known/agent.json", methods=["GET"])
-    def agent_card():
+    async def agent_card():
         """A2A Agent Card endpoint."""
         return jsonify({
             "name": agent_name,
@@ -91,7 +119,7 @@ def create_app(
         })
 
     @app.route("/generate", methods=["POST"])
-    def generate():
+    async def generate():
         """
         Generate SQL from a task.
 
@@ -110,7 +138,7 @@ def create_app(
             "task_id": "sqlite_simple_select"
         }
         """
-        data = request.get_json()
+        data = await request.get_json()
 
         if not data:
             return jsonify({"error": "Request body required"}), 400
@@ -119,8 +147,11 @@ def create_app(
             return jsonify({"error": "Question required"}), 400
 
         try:
-            # Use synchronous version
-            result = agent.handle_task_sync(data)
+            # Use async version if available, otherwise sync
+            if hasattr(agent, 'handle_task'):
+                result = await agent.handle_task(data)
+            else:
+                result = agent.handle_task_sync(data)
             return jsonify(result)
 
         except Exception as e:
@@ -132,13 +163,13 @@ def create_app(
 
     # Also support A2A-style message endpoint
     @app.route("/a2a/message", methods=["POST"])
-    def a2a_message():
+    async def a2a_message():
         """
         Handle A2A message format.
 
         The Green Agent may send messages in A2A format.
         """
-        data = request.get_json()
+        data = await request.get_json()
 
         if not data:
             return jsonify({"error": "Request body required"}), 400
@@ -159,7 +190,10 @@ def create_app(
             task_data = data  # Fallback to whole body
 
         try:
-            result = agent.handle_task_sync(task_data)
+            if hasattr(agent, 'handle_task'):
+                result = await agent.handle_task(task_data)
+            else:
+                result = agent.handle_task_sync(task_data)
             return jsonify({
                 "parts": [
                     {
@@ -181,6 +215,16 @@ def create_app(
                     }
                 ]
             }), 500
+
+    @app.before_serving
+    async def startup():
+        """Initialize resources on startup."""
+        print("Purple Agent starting up...")
+
+    @app.after_serving
+    async def shutdown():
+        """Clean up resources on shutdown."""
+        print("Purple Agent shutting down...")
 
     return app
 
@@ -245,11 +289,24 @@ def main():
         agent_name=args.name,
     )
 
-    app.run(
-        host=args.host,
-        port=args.port,
-        debug=args.debug,
-    )
+    # Use hypercorn for production-ready async server
+    try:
+        from hypercorn.config import Config
+        from hypercorn.asyncio import serve
+
+        config = Config()
+        config.bind = [f"{args.host}:{args.port}"]
+        config.accesslog = "-"  # Log to stdout
+
+        asyncio.run(serve(app, config))
+    except ImportError:
+        # Fallback to Quart's built-in server (development only)
+        print("Warning: hypercorn not installed, using development server")
+        app.run(
+            host=args.host,
+            port=args.port,
+            debug=args.debug,
+        )
 
 
 if __name__ == "__main__":
