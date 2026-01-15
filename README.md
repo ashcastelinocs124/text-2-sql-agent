@@ -19,6 +19,7 @@
 - [Evaluation Methodology](#evaluation-methodology)
 - [Error Category Metrics](#error-category-metrics)
 - [Docker Deployment](#docker-deployment)
+- [Robust Error Handling & Logging](#robust-error-handling--logging)
 - [Reproducibility](#reproducibility)
 - [Resource Requirements](#resource-requirements)
 - [API Reference](#api-reference)
@@ -467,6 +468,152 @@ docker build --platform linux/amd64 -f docker/Dockerfile.green -t agentx-green .
 
 # Build Purple Agent
 docker build --platform linux/amd64 -f docker/Dockerfile.purple -t agentx-purple .
+```
+
+---
+
+## Robust Error Handling & Logging
+
+AgentX implements production-grade resilience patterns to ensure reliable operation during agent tournaments and benchmarks.
+
+### Circuit Breaker Pattern
+
+Prevents cascading failures when agents become unavailable:
+
+```python
+from a2a.resilience import CircuitBreaker, CircuitState
+
+# Circuit breaker automatically opens after 3 failures
+breaker = CircuitBreaker(
+    failure_threshold=3,      # Open after 3 consecutive failures
+    recovery_timeout=30.0,    # Wait 30s before testing recovery
+    half_open_max_calls=1,    # Allow 1 test call in half-open state
+)
+
+# Usage in agent communication
+if breaker.can_execute():
+    try:
+        result = await send_task_to_agent(endpoint, task)
+        breaker.record_success()
+    except Exception:
+        breaker.record_failure()
+        # After 3 failures, circuit opens → fast-fail for 30s
+else:
+    raise CircuitOpenError(f"Agent {endpoint} unavailable")
+```
+
+**Circuit States:**
+```
+┌─────────┐  3 failures  ┌─────────┐  30s timeout  ┌───────────┐
+│ CLOSED  │ ───────────▶ │  OPEN   │ ────────────▶ │ HALF-OPEN │
+│(normal) │              │(reject) │               │  (test)   │
+└─────────┘              └─────────┘               └───────────┘
+     ▲                                                   │
+     │              success                              │
+     └───────────────────────────────────────────────────┘
+```
+
+### Retry with Exponential Backoff
+
+```python
+from a2a.resilience import ResilientHTTPClient
+
+# HTTP client with automatic retry and circuit breaker
+client = ResilientHTTPClient(
+    circuit_failure_threshold=3,
+    circuit_recovery_timeout=30.0,
+)
+
+# Automatically retries with exponential backoff (1s, 2s, 4s)
+response = await client.request(
+    "POST",
+    "http://agent:8080/generate",
+    operation_type="sql_generation",  # 60s timeout for LLM calls
+    json={"question": "...", "schema": {...}}
+)
+```
+
+**Timeout Configuration:**
+| Operation Type | Default Timeout | Rationale |
+|----------------|-----------------|-----------|
+| `health_check` | 5s | Quick liveness/readiness probes |
+| `sql_generation` | 60s | LLM generation can be slow |
+| `schema_fetch` | 10s | Database schema operations |
+| `default` | 30s | Standard operations |
+
+### Comprehensive Health Checks
+
+Kubernetes-compatible liveness and readiness probes:
+
+```python
+from a2a.health import HealthChecker, HealthStatus
+
+# Initialize health checker with agent and executor
+checker = HealthChecker(
+    agent=green_agent,
+    executor=sql_executor,
+    version="1.0.0",
+)
+
+# Liveness probe (quick, <100ms)
+liveness = await checker.check_liveness()
+# Returns: {"status": "healthy", "checks": [{"name": "process", "status": "pass"}]}
+
+# Readiness probe (thorough)
+readiness = await checker.check_readiness()
+# Checks: tasks_loaded, database, llm_client, custom checks
+```
+
+**Health Response Example:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-01-15T01:25:00Z",
+  "version": "1.0.0",
+  "checks": [
+    {"name": "tasks_loaded", "status": "pass", "duration_ms": 0.5, "message": "27 tasks loaded"},
+    {"name": "database", "status": "pass", "duration_ms": 1.2, "message": "Database accessible"},
+    {"name": "llm_client", "status": "pass", "duration_ms": 0.3, "message": "LLM client configured (gemini)"}
+  ]
+}
+```
+
+### Error Recovery Strategies
+
+| Error Type | Recovery Strategy |
+|------------|-------------------|
+| **Network Timeout** | Retry 3x with exponential backoff |
+| **Agent Unavailable** | Circuit breaker → fast-fail → auto-recover |
+| **Database Error** | Log, mark task failed, continue evaluation |
+| **LLM API Error** | Retry with backoff, degrade gracefully |
+| **Invalid SQL** | Classify error, score as 0, provide feedback |
+
+### Logging Configuration
+
+```python
+import logging
+
+# Enable detailed logging for debugging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Component-specific log levels
+logging.getLogger('a2a.server').setLevel(logging.DEBUG)      # API requests
+logging.getLogger('a2a.resilience').setLevel(logging.INFO)   # Circuit breaker events
+logging.getLogger('a2a.health').setLevel(logging.DEBUG)      # Health checks
+logging.getLogger('agentx.executor').setLevel(logging.INFO)  # SQL execution
+```
+
+**Sample Log Output:**
+```
+2025-01-15 01:25:00,123 - a2a.server - INFO - Starting assessment abc123 with 2 participants
+2025-01-15 01:25:00,456 - a2a.resilience - INFO - Circuit CLOSED for agent1:8080
+2025-01-15 01:25:01,789 - agentx.executor - INFO - Executed query in 2.3ms, 5 rows returned
+2025-01-15 01:25:02,012 - a2a.resilience - WARN - Failure 1/3 for agent2:8081
+2025-01-15 01:25:05,345 - a2a.resilience - WARN - Circuit OPEN for agent2:8081 (3 failures)
+2025-01-15 01:25:35,678 - a2a.resilience - INFO - Circuit HALF-OPEN for agent2:8081, testing...
 ```
 
 ---
