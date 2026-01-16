@@ -505,8 +505,8 @@ Text-2-SQL Agent classifies errors to provide actionable debugging insights:
 
 | Image | Description | Size |
 |-------|-------------|------|
-| `keshavdalmia10/agentx-green` | SQL Benchmark Evaluator | ~500MB |
-| `keshavdalmia10/agentx-purple` | LLM SQL Generator | ~400MB |
+| `ghcr.io/ashcastelinocs124/agentx-green` | SQL Benchmark Evaluator (A2A Protocol) | ~600MB |
+| `ghcr.io/ashcastelinocs124/agentx-purple` | LLM SQL Generator | ~400MB |
 
 ### Docker Compose
 
@@ -514,34 +514,57 @@ Text-2-SQL Agent classifies errors to provide actionable debugging insights:
 # docker-compose.agentbeats.yml
 services:
   agentx-green:
-    image: keshavdalmia10/agentx-green:latest
+    image: ghcr.io/ashcastelinocs124/agentx-green:latest
     ports:
-      - "8001:8001"
-    command: ["--host", "0.0.0.0", "--port", "8001", "--dialect", "sqlite"]
+      - "9009:9009"
+    command: ["--host", "0.0.0.0", "--port", "9009", "--dialect", "sqlite"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9009/.well-known/agent.json')"]
       interval: 10s
       timeout: 5s
       retries: 3
 
   agentx-purple-gemini:
-    image: keshavdalmia10/agentx-purple:latest
+    image: ghcr.io/ashcastelinocs124/agentx-purple:latest
     ports:
       - "8080:8080"
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     command: ["--host", "0.0.0.0", "--port", "8080", "--llm", "gemini"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/.well-known/agent.json')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 ```
 
 ### Build from Source
 
 ```bash
-# Build Green Agent
+# Build Green Agent (A2A Protocol Compatible)
 docker build --platform linux/amd64 -f docker/Dockerfile.green -t agentx-green .
 
 # Build Purple Agent
 docker build --platform linux/amd64 -f docker/Dockerfile.purple -t agentx-purple .
+
+# Multi-platform build for GHCR
+docker buildx build --platform linux/amd64 -f docker/Dockerfile.green -t ghcr.io/ashcastelinocs124/agentx-green:latest --push .
+docker buildx build --platform linux/amd64 -f docker/Dockerfile.purple -t ghcr.io/ashcastelinocs124/agentx-purple:latest --push .
 ```
+
+### Key Changes in Latest Docker Images
+
+#### Green Agent (A2A Protocol)
+- **A2A Protocol Support**: Now implements standard A2A protocol for AgentBeats compatibility
+- **New Entrypoint**: Uses `entrypoint_green_a2a.py` with A2AStarletteApplication
+- **Port Change**: Default port changed from 8001 to 9009
+- **Dependencies**: Added `a2a-sdk[http-server]>=0.3.20` and `uvicorn>=0.38.0`
+- **Health Check**: Uses Python urllib instead of curl (compatible with slim images)
+
+#### Purple Agent
+- **Agent Card Support**: Added `/.well-known/agent-card.json` endpoint for AgentBeats
+- **Health Check**: Uses Python urllib for compatibility
+- **Multi-LLM Support**: Gemini (default) and OpenAI via environment variables
 
 ---
 
