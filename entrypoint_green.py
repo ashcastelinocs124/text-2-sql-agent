@@ -135,6 +135,7 @@ def create_app(
                     "description": "Evaluates SQL agents on correctness, efficiency, safety, completeness, semantic accuracy, best practices, and plan quality",
                     "inputModes": ["application/json"],
                     "outputModes": ["application/json"],
+                    "tags": [],
                 }
             ],
             "defaultInputModes": ["application/json"],

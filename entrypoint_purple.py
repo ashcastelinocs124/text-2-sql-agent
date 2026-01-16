@@ -112,6 +112,7 @@ def create_app(
                     "description": "Generates SQL queries from natural language questions",
                     "inputModes": ["application/json"],
                     "outputModes": ["application/json"],
+                    "tags": [],
                 }
             ],
             "defaultInputModes": ["application/json"],
