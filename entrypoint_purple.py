@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from quart import Quart, request, jsonify
 from quart_cors import cors
 
-from a2a.purple_agent import SampleSQLAgent
-from a2a.health import HealthChecker
+from agentx_a2a.purple_agent import SampleSQLAgent
+from agentx_a2a.health import HealthChecker
 
 
 def create_app(

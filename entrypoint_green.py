@@ -27,9 +27,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from quart import Quart, request, jsonify, Response
 from quart_cors import cors
 
-from a2a.green_agent import SQLBenchmarkGreenAgent, AssessmentConfig
-from a2a.health import HealthChecker
-from a2a.resilience import ResilientHTTPClient, TimeoutConfig
+from agentx_a2a.green_agent import SQLBenchmarkGreenAgent, AssessmentConfig
+from agentx_a2a.health import HealthChecker
+from agentx_a2a.resilience import ResilientHTTPClient, TimeoutConfig
 
 
 def create_app(

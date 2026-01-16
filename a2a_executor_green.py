@@ -22,7 +22,7 @@ from a2a.utils import (
 )
 from a2a.utils.errors import ServerError
 
-from a2a.green_agent import SQLBenchmarkGreenAgent
+from agentx_a2a.green_agent import SQLBenchmarkGreenAgent
 
 
 TERMINAL_STATES = {
