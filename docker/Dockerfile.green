@@ -29,6 +29,8 @@ COPY evaluation/ ./evaluation/
 COPY a2a/ ./a2a/
 COPY tasks/ ./tasks/
 COPY entrypoint_green.py .
+COPY entrypoint_green_a2a.py .
+COPY a2a_executor_green.py .
 
 # Create non-root user
 RUN useradd -m -u 1000 agentx && chown -R agentx:agentx /app
@@ -36,6 +38,6 @@ USER agentx
 
 EXPOSE 8001
 
-# AgentBeats-compatible entrypoint
-ENTRYPOINT ["python", "entrypoint_green.py"]
-CMD ["--host", "0.0.0.0", "--port", "8001"]
+# AgentBeats-compatible entrypoint (A2A protocol)
+ENTRYPOINT ["python", "entrypoint_green_a2a.py"]
+CMD ["--host", "0.0.0.0", "--port", "9009"]
