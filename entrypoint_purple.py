@@ -118,6 +118,11 @@ def create_app(
             "defaultOutputModes": ["application/json"],
         })
 
+    @app.route("/.well-known/agent-card.json", methods=["GET"])
+    async def agent_card_json():
+        """A2A Agent Card endpoint (AgentBeats alias)."""
+        return await agent_card()
+
     @app.route("/generate", methods=["POST"])
     async def generate():
         """
