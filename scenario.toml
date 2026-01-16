@@ -8,23 +8,23 @@ description = "Evaluates SQL agents on correctness, efficiency, safety, and best
 [green]
 name = "text-2-sql-agent-green"
 # GHCR image for AgentBeats platform:
-image = "ghcr.io/ashcastelinocs124/agentx-green:latest"
+image = "ghcr.io/ashcastelinocs124/text-2-sql-agent-green:latest"
 # Local development (uncomment to use):
 # command = "python entrypoint_green.py --port 8001 --dialect sqlite --scorer-preset default"
 
 [[purple]]
-name = "sql-agent-gemini"
+name = "text-2-sql-gemini-agent"
 role = "sql_agent_1"
 # GHCR image for AgentBeats platform:
-image = "ghcr.io/ashcastelinocs124/agentx-purple:latest"
+image = "ghcr.io/ashcastelinocs124/text-2-sql-agent-purple:latest"
 # Local development (uncomment to use):
 # command = "python entrypoint_purple.py --port 8080 --llm gemini --name 'Gemini SQL Agent'"
 
 [[purple]]
-name = "sql-agent-openai"
+name = "open-ai-text-2sql"
 role = "sql_agent_2"
 # GHCR image for AgentBeats platform:
-image = "ghcr.io/ashcastelinocs124/agentx-purple:latest"
+image = "ghcr.io/ashcastelinocs124/text-2-sql-agent-purple:latest"
 # Local development (uncomment to use):
 # command = "python entrypoint_purple.py --port 8081 --llm openai --name 'OpenAI SQL Agent'"
 
