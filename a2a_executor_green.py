@@ -105,18 +105,20 @@ class SQLBenchmarkExecutor(AgentExecutor):
                 if update.artifact:
                     final_artifact = update.artifact
 
-            # Complete with artifact
+            # Add artifact before completing
             if final_artifact:
-                artifact_msg = msg.model_copy()
-                artifact_msg.parts = [
-                    Part(DataPart(
-                        kind="data",
-                        data=final_artifact.to_dict(),
-                    ))
-                ]
-                await updater.complete(artifact_msg)
-            else:
-                await updater.complete()
+                await updater.add_artifact(
+                    parts=[
+                        Part(DataPart(
+                            kind="data",
+                            data=final_artifact.to_dict(),
+                        ))
+                    ],
+                    name="Results"
+                )
+            
+            # Complete task
+            await updater.complete()
 
         except Exception as e:
             print(f"Task failed with error: {e}")
